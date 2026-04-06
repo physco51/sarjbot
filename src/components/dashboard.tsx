@@ -65,6 +65,15 @@ export function Dashboard({
 }) {
   const [sortBy, setSortBy] = useState<SortKey>("price_asc");
   const [chargeFilter, setChargeFilter] = useState<ChargeFilter>("all");
+
+  // Auto-switch sort when charge filter changes
+  const handleChargeFilter = (f: ChargeFilter) => {
+    setChargeFilter(f);
+    if (f === "AC") setSortBy("ac_asc");
+    else if (f === "DC") setSortBy("dc_asc");
+    else if (f === "HPC") setSortBy("hpc_asc");
+    else setSortBy("price_asc");
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -138,7 +147,7 @@ export function Dashboard({
             {(["all", "AC", "DC", "HPC"] as ChargeFilter[]).map((f) => (
               <button
                 key={f}
-                onClick={() => setChargeFilter(f)}
+                onClick={() => handleChargeFilter(f)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   chargeFilter === f
                     ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
@@ -210,7 +219,7 @@ export function Dashboard({
           {chargeFilter !== "all" && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary">
               {chargeFilter}
-              <button onClick={() => setChargeFilter("all")} className="hover:text-foreground">&#10005;</button>
+              <button onClick={() => handleChargeFilter("all")} className="hover:text-foreground">&#10005;</button>
             </span>
           )}
           {verifiedOnly && (

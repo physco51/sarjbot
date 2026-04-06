@@ -31,6 +31,7 @@ export default function KarsilastirPage() {
   const [allData, setAllData] = useState<OperatorWithPrices[]>([]);
   const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
   const [listFilter, setListFilter] = useState("");
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -51,10 +52,18 @@ export default function KarsilastirPage() {
   };
 
   const filteredList = useMemo(() => {
-    if (!listFilter.trim()) return allData;
-    const q = listFilter.toLowerCase();
-    return allData.filter((d) => d.name.toLowerCase().includes(q));
-  }, [allData, listFilter]);
+    let result = allData;
+    if (listFilter.trim()) {
+      const q = listFilter.toLowerCase();
+      result = result.filter((d) => d.name.toLowerCase().includes(q));
+    }
+    if (verifiedOnly) {
+      result = result.filter((d) =>
+        d.prices.AC?.isVerified || d.prices.DC?.isVerified || d.prices.HPC?.isVerified
+      );
+    }
+    return result;
+  }, [allData, listFilter, verifiedOnly]);
 
   const selectedData = useMemo(
     () => selectedSlugs.map((s) => allData.find((d) => d.slug === s)!).filter(Boolean),
@@ -89,15 +98,25 @@ export default function KarsilastirPage() {
 
       {/* Operator list with checkboxes */}
       <div className="rounded-xl border border-border/60 bg-card mb-6">
-        {/* List filter */}
-        <div className="px-3 py-2 border-b border-border/40">
+        {/* List filter + verified toggle */}
+        <div className="px-3 py-2 border-b border-border/40 flex items-center gap-2">
           <input
             type="text"
             placeholder="Filtrele..."
             value={listFilter}
             onChange={(e) => setListFilter(e.target.value)}
-            className="w-full h-8 px-2 rounded-md bg-background border border-border/40 text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/50"
+            className="flex-1 h-8 px-2 rounded-md bg-background border border-border/40 text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/50"
           />
+          <button
+            onClick={() => setVerifiedOnly(!verifiedOnly)}
+            className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all ${
+              verifiedOnly
+                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                : "bg-background border border-border/40 text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {"\u2713"} Dogrulanmis
+          </button>
         </div>
 
         {/* Scrollable list - 10 rows visible */}
@@ -129,9 +148,14 @@ export default function KarsilastirPage() {
                   )}
                 </div>
 
-                {/* Name */}
+                {/* Name + verified */}
                 <span className={`flex-1 truncate ${isSelected ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
                   {op.name}
+                  {(op.prices.AC?.isVerified || op.prices.DC?.isVerified || op.prices.HPC?.isVerified) ? (
+                    <span className="ml-1 text-emerald-400 text-[10px]">{"\u2713"}</span>
+                  ) : (
+                    <span className="ml-1 text-amber-400 text-[10px]">{"\u26A0"}</span>
+                  )}
                 </span>
 
                 {/* Quick prices */}
@@ -227,10 +251,19 @@ export default function KarsilastirPage() {
                         return (
                           <td key={op.slug} className="text-center px-3 py-3">
                             {price ? (
-                              <span className={`tabular-nums font-bold ${isBest ? "text-emerald-400" : getPriceColor(price.min)}`}>
-                                {formatPrice(price)}
-                                {isBest && <span className="ml-1 text-[10px]">{"\u2713"}</span>}
-                              </span>
+                              <div>
+                                <span className={`tabular-nums font-bold ${isBest ? "text-emerald-400" : getPriceColor(price.min)}`}>
+                                  {formatPrice(price)}
+                                  {isBest && <span className="ml-1 text-[10px]">{"\u2713"}</span>}
+                                </span>
+                                <div className="text-[9px] mt-0.5">
+                                  {price.isVerified ? (
+                                    <span className="text-emerald-400/60">{"\u2713"} resmi</span>
+                                  ) : (
+                                    <span className="text-amber-400/60">{"\u26A0"} 3.parti</span>
+                                  )}
+                                </div>
+                              </div>
                             ) : (
                               <span className="text-muted-foreground/30">-</span>
                             )}
