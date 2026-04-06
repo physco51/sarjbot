@@ -5,7 +5,7 @@ import type { OperatorWithPrices } from "@/lib/types";
 import { OperatorCard } from "./operator-card";
 import { AppLinks } from "./app-store-badges";
 
-type SortKey = "price_asc" | "price_desc" | "name_asc" | "ac_asc" | "dc_asc" | "hpc_asc";
+type SortKey = "price_asc" | "price_desc" | "name_asc" | "name_desc" | "ac_asc" | "ac_desc" | "dc_asc" | "dc_desc" | "hpc_asc" | "hpc_desc";
 type ViewMode = "grid" | "list";
 type ChargeFilter = "all" | "AC" | "DC" | "HPC";
 
@@ -42,6 +42,17 @@ function getSortFn(key: SortKey) {
         (a.prices.HPC?.min ?? Infinity) - (b.prices.HPC?.min ?? Infinity);
     case "name_asc":
       return (a: OperatorWithPrices, b: OperatorWithPrices) => a.name.localeCompare(b.name, "tr");
+    case "name_desc":
+      return (a: OperatorWithPrices, b: OperatorWithPrices) => b.name.localeCompare(a.name, "tr");
+    case "ac_desc":
+      return (a: OperatorWithPrices, b: OperatorWithPrices) =>
+        (b.prices.AC?.min ?? 0) - (a.prices.AC?.min ?? 0);
+    case "dc_desc":
+      return (a: OperatorWithPrices, b: OperatorWithPrices) =>
+        (b.prices.DC?.min ?? 0) - (a.prices.DC?.min ?? 0);
+    case "hpc_desc":
+      return (a: OperatorWithPrices, b: OperatorWithPrices) =>
+        (b.prices.HPC?.min ?? 0) - (a.prices.HPC?.min ?? 0);
   }
 }
 
@@ -219,13 +230,13 @@ export function Dashboard({
       ) : (
         <div className="rounded-xl border border-border/60 overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-card/80">
+            <thead className="bg-card/80 sticky top-[108px] z-30">
               <tr className="border-b border-border/40">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">#</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">Operator</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">AC (TL/kWh)</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">DC (TL/kWh)</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">HPC (TL/kWh)</th>
+                <SortableTh label="Operator" sortKey="name_asc" currentSort={sortBy} onSort={setSortBy} align="left" />
+                <SortableTh label="AC (TL/kWh)" sortKey="ac_asc" currentSort={sortBy} onSort={setSortBy} align="right" />
+                <SortableTh label="DC (TL/kWh)" sortKey="dc_asc" currentSort={sortBy} onSort={setSortBy} align="right" />
+                <SortableTh label="HPC (TL/kWh)" sortKey="hpc_asc" currentSort={sortBy} onSort={setSortBy} align="right" />
                 <th className="text-center px-4 py-3 text-xs font-semibold text-muted-foreground">Uygulama</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Kaynak</th>
               </tr>
@@ -314,4 +325,59 @@ function getPriceColorFn(price: number): string {
   if (price < 9) return "text-emerald-400";
   if (price < 12) return "text-amber-400";
   return "text-red-400";
+}
+
+const SORT_PAIRS: Record<string, { asc: SortKey; desc: SortKey }> = {
+  name_asc: { asc: "name_asc", desc: "name_desc" },
+  name_desc: { asc: "name_asc", desc: "name_desc" },
+  ac_asc: { asc: "ac_asc", desc: "ac_desc" },
+  ac_desc: { asc: "ac_asc", desc: "ac_desc" },
+  dc_asc: { asc: "dc_asc", desc: "dc_desc" },
+  dc_desc: { asc: "dc_asc", desc: "dc_desc" },
+  hpc_asc: { asc: "hpc_asc", desc: "hpc_desc" },
+  hpc_desc: { asc: "hpc_asc", desc: "hpc_desc" },
+};
+
+function SortableTh({
+  label,
+  sortKey,
+  currentSort,
+  onSort,
+  align = "left",
+}: {
+  label: string;
+  sortKey: SortKey;
+  currentSort: SortKey;
+  onSort: (key: SortKey) => void;
+  align?: "left" | "right";
+}) {
+  const pair = SORT_PAIRS[sortKey];
+  const isActive = currentSort === pair?.asc || currentSort === pair?.desc;
+  const isDesc = currentSort === pair?.desc;
+
+  const handleClick = () => {
+    if (!isActive) {
+      onSort(sortKey);
+    } else if (!isDesc) {
+      onSort(pair.desc);
+    } else {
+      onSort(pair.asc);
+    }
+  };
+
+  return (
+    <th
+      className={`px-4 py-3 text-xs font-semibold cursor-pointer select-none group transition-colors hover:text-primary ${
+        align === "right" ? "text-right" : "text-left"
+      } ${isActive ? "text-primary" : "text-muted-foreground"}`}
+      onClick={handleClick}
+    >
+      <span className="inline-flex items-center gap-1">
+        {label}
+        <span className={`transition-opacity ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-40"}`}>
+          {isDesc ? "\u2193" : "\u2191"}
+        </span>
+      </span>
+    </th>
+  );
 }
