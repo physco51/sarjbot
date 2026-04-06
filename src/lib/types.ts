@@ -4,6 +4,8 @@ export interface Operator {
   slug: string;
   logoUrl: string | null;
   websiteUrl: string | null;
+  playStoreUrl: string | null;
+  appStoreUrl: string | null;
   description: string | null;
   isActive: boolean | null;
 }

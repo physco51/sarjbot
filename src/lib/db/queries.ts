@@ -35,6 +35,8 @@ export async function getAllOperatorsWithPrices(): Promise<OperatorWithPrices[]>
       slug: op.slug,
       logoUrl: op.logoUrl,
       websiteUrl: op.websiteUrl,
+      playStoreUrl: op.playStoreUrl,
+      appStoreUrl: op.appStoreUrl,
       description: op.description,
       isActive: op.isActive,
       prices: {

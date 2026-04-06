@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { OperatorWithPrices } from "@/lib/types";
+import { AppLinks } from "./app-store-badges";
 
 function getPriceColor(price: number): string {
   if (price < 9) return "text-emerald-400";
@@ -132,12 +133,15 @@ export function OperatorCard({
         )}
       </div>
 
-      {/* Source */}
-      {(op.prices.AC?.source || op.prices.DC?.source) && (
-        <div className="text-[10px] text-muted-foreground/50 truncate">
-          Kaynak: {op.prices.AC?.source || op.prices.DC?.source}
-        </div>
-      )}
+      {/* App links + Source */}
+      <div className="flex items-center justify-between">
+        <AppLinks playStoreUrl={op.playStoreUrl} appStoreUrl={op.appStoreUrl} compact />
+        {(op.prices.AC?.source || op.prices.DC?.source) && (
+          <div className="text-[10px] text-muted-foreground/50 truncate">
+            {op.prices.AC?.source || op.prices.DC?.source}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

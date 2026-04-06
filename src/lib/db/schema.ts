@@ -7,6 +7,8 @@ export const operators = sqliteTable("operators", {
   slug: text("slug").notNull().unique(),
   logoUrl: text("logo_url"),
   websiteUrl: text("website_url"),
+  playStoreUrl: text("play_store_url"),
+  appStoreUrl: text("app_store_url"),
   description: text("description"),
   isActive: integer("is_active", { mode: "boolean" }).default(true),
   createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`),

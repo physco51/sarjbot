@@ -2,6 +2,7 @@ import { getOperatorBySlug } from "@/lib/db/queries";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { PriceInfo } from "@/lib/types";
+import { AppLinks } from "@/components/app-store-badges";
 
 export const dynamic = "force-dynamic";
 
@@ -68,6 +69,13 @@ export default async function OperatorPage({
           >
             {new URL(operator.websiteUrl).hostname} &#8599;
           </a>
+        )}
+
+        {/* App Store Links */}
+        {(operator.playStoreUrl || operator.appStoreUrl) && (
+          <div className="mt-3">
+            <AppLinks playStoreUrl={operator.playStoreUrl} appStoreUrl={operator.appStoreUrl} />
+          </div>
         )}
       </div>
 

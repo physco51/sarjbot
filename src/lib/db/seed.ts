@@ -20,6 +20,8 @@ sqlite.exec(`
     slug TEXT NOT NULL UNIQUE,
     logo_url TEXT,
     website_url TEXT,
+    play_store_url TEXT,
+    app_store_url TEXT,
     description TEXT,
     is_active INTEGER DEFAULT 1,
     created_at INTEGER DEFAULT (unixepoch()),
@@ -170,6 +172,67 @@ const operatorData = [
   { name: "Neva Charge", slug: "neva-charge", websiteUrl: "https://www.nevasarj.com/pages/ourstations/car-charger-ac-dc-kwh-price-tariff.html", description: "AC ve DC sarj istasyonlari" },
 ];
 
+// App store links mapping
+const appLinks: Record<string, { playStore: string | null; appStore: string | null }> = {
+  "zes": { playStore: "https://play.google.com/store/apps/details?id=com.solidict.zorluenerji", appStore: "https://apps.apple.com/us/app/zes-ev-station-network/id1401503272" },
+  "trugo": { playStore: "https://play.google.com/store/apps/details?id=com.togg.trugoapp", appStore: "https://apps.apple.com/tr/app/trugo/id6443913003" },
+  "esarj": { playStore: "https://play.google.com/store/apps/details?id=com.esarj.mobile", appStore: "https://apps.apple.com/tr/app/e%C5%9Farj-mobile/id982709995" },
+  "sharz": { playStore: "https://play.google.com/store/apps/details?id=com.ipitex.sharz", appStore: "https://apps.apple.com/us/app/sharz/id1445392005" },
+  "wat": { playStore: "https://play.google.com/store/apps/details?id=com.watmobilite.watchtower", appStore: "https://apps.apple.com/tr/app/wat-mobilite-%C5%9Farj/id6754679342" },
+  "enyakit": { playStore: "https://play.google.com/store/apps/details?id=com.ilerleyen.EnYakit", appStore: "https://apps.apple.com/tr/app/enyak%C4%B1t/id1498514720" },
+  "oto-jet": { playStore: "https://play.google.com/store/apps/details?id=com.otojet.evcharge", appStore: "https://apps.apple.com/ge/app/otojet-ara%C3%A7-%C5%9Farj-i-stasyon-a%C4%9F%C4%B1/id6444728320" },
+  "astor": { playStore: "https://play.google.com/store/apps/details?id=com.astor", appStore: "https://apps.apple.com/us/app/astor-%C5%9Farj/id1658407530" },
+  "voltrun": { playStore: "https://play.google.com/store/apps/details?id=com.voltrun", appStore: "https://apps.apple.com/us/app/voltrun/id1242236792" },
+  "oncharge": { playStore: "https://play.google.com/store/apps/details?id=com.kalyonev.oncharge", appStore: "https://apps.apple.com/us/app/oncharge-ev-charging-station/id1631342279" },
+  "shell-recharge": { playStore: "https://play.google.com/store/apps/details?id=com.togg.shellapp", appStore: "https://apps.apple.com/tr/app/shell-recharge-t%C3%BCrkiye/id6451115578" },
+  "e-pow": { playStore: "https://play.google.com/store/apps/details?id=com.petrolofisi.epower", appStore: "https://apps.apple.com/us/app/e-power/id6444776305" },
+  "rhg-enerturk": { playStore: "https://play.google.com/store/apps/details?id=com.enerturk", appStore: "https://apps.apple.com/tr/app/rhg-enerturk/id6443610258" },
+  "d-charge": { playStore: "https://play.google.com/store/apps/details?id=tr.com.dteknoloji.dcharge", appStore: "https://apps.apple.com/kw/app/d-charge/id6477779137" },
+  "beefull": { playStore: "https://play.google.com/store/apps/details?id=com.beefull.charge", appStore: "https://apps.apple.com/tr/app/beefull/id1592420541" },
+  "tuncmatik": { playStore: "https://play.google.com/store/apps/details?id=com.doldurmobile.tuncmatik", appStore: "https://apps.apple.com/us/app/tuncmatik-charge/id6470379374" },
+  "sepascharge": { playStore: "https://play.google.com/store/apps/details?id=com.sepas.sepas", appStore: "https://apps.apple.com/tr/app/sepascharge/id6743440030" },
+  "elaris": { playStore: "https://play.google.com/store/apps/details?id=com.elaris.mobil", appStore: "https://apps.apple.com/us/app/elaris/id6747248231" },
+  "porty": { playStore: "https://play.google.com/store/apps/details?id=porty.com.thetwoweeks", appStore: "https://apps.apple.com/gr/app/porty4car/id6504822077" },
+  "volti": { playStore: "https://play.google.com/store/apps/details?id=com.plugsurfing.volti", appStore: "https://apps.apple.com/tr/app/volti-network/id6445827156" },
+  "tesla": { playStore: "https://play.google.com/store/apps/details?id=com.teslamotors.tesla", appStore: "https://apps.apple.com/us/app/tesla/id582007913" },
+  "powersarj": { playStore: "https://play.google.com/store/apps/details?id=com.marsis.powersarjapp", appStore: "https://apps.apple.com/us/app/power%C5%9Farj/id6443541077" },
+  "ev-bee": { playStore: "https://play.google.com/store/apps/details?id=com.maviarge.evbee", appStore: null },
+  "k-sarj": { playStore: "https://play.google.com/store/apps/details?id=com.ipitex.ksarj", appStore: "https://apps.apple.com/tr/app/ksarj/id6470809641" },
+  "mycharge": { playStore: "https://play.google.com/store/apps/details?id=com.mechatronic.ev", appStore: "https://apps.apple.com/tr/app/mycharge/id6737592400" },
+  "monokon": { playStore: "https://play.google.com/store/apps/details?id=com.monokon.monokonev", appStore: "https://apps.apple.com/tr/app/monokon-ev-charge/id6449960542" },
+  "fortis": { playStore: "https://play.google.com/store/apps/details?id=com.fortisenergy", appStore: "https://apps.apple.com/pe/app/fortis-energy/id6450174012" },
+  "clixolar": { playStore: "https://play.google.com/store/apps/details?id=com.clixsolar.electrinn", appStore: "https://apps.apple.com/fi/app/clixsolar/id6468252945" },
+  "everstart": { playStore: "https://play.google.com/store/apps/details?id=tr.com.migros.miggosarj", appStore: "https://apps.apple.com/us/app/miggo-%C5%9Farj/id6444700185" },
+  "sarjon": { playStore: "https://play.google.com/store/apps/details?id=com.sarjon.cp.app", appStore: "https://apps.apple.com/us/app/sarjon/id1587123679" },
+  "smart-solargize": { playStore: "https://play.google.com/store/apps/details?id=com.smartsolar.solargize", appStore: "https://apps.apple.com/us/app/solargize/id6464482583" },
+  "hizzlan": { playStore: "https://play.google.com/store/apps/details?id=com.hizzlan.hizzlan", appStore: "https://apps.apple.com/us/app/h%C4%B1zzlan/id6448905773" },
+  "gsm-charge": { playStore: "https://play.google.com/store/apps/details?id=tr.com.gsmcharge.app", appStore: "https://apps.apple.com/us/app/gsm-charge/id6444185286" },
+  "onizsarj": { playStore: "https://play.google.com/store/apps/details?id=com.oniz", appStore: "https://apps.apple.com/il/app/%C3%B6niz%C5%9Farj/id6449744070" },
+  "neva-charge": { playStore: "https://play.google.com/store/apps/details?id=io.electroop.nevasarj", appStore: "https://apps.apple.com/us/app/neva-%C5%9Farj/id1666078045" },
+  "aksa-sarj": { playStore: "https://play.google.com/store/apps/details?id=tr.com.aksaelektrik.aksasarj", appStore: "https://apps.apple.com/us/app/aksa-%C5%9Farj/id1554479978" },
+  "360-enerji": { playStore: "https://play.google.com/store/apps/details?id=io.electroop.enerji360", appStore: "https://apps.apple.com/us/app/360-enerji/id1667460333" },
+  "arsima": { playStore: "https://play.google.com/store/apps/details?id=com.arsimaenergy", appStore: "https://apps.apple.com/tr/app/arsima-energy/id6450647894" },
+  "bladeco": { playStore: "https://play.google.com/store/apps/details?id=com.bladeco.bladecocharge", appStore: "https://apps.apple.com/tr/app/bladeco-charge/id6473955452" },
+  "dicle-kok": { playStore: "https://play.google.com/store/apps/details?id=com.fourtek.otopriz", appStore: "https://apps.apple.com/tr/app/otopriz/id6447184127" },
+  "ecobox": { playStore: "https://play.google.com/store/apps/details?id=com.ecobox.ev", appStore: "https://apps.apple.com/tr/app/ecobox-%C5%9Farj/id6451493157" },
+  "ispirli": { playStore: "https://play.google.com/store/apps/details?id=com.ispirli.ispirli", appStore: "https://apps.apple.com/us/app/i-%C5%9Farj/id6448745018" },
+  "lumhouse": { playStore: "https://play.google.com/store/apps/details?id=io.electroop.lumicle", appStore: "https://apps.apple.com/us/app/lumicle/id1639325347" },
+  "magicline": { playStore: "https://play.google.com/store/apps/details?id=com.magiclinesarj.magiclinemobile", appStore: "https://apps.apple.com/es/app/magicline-sarj/id6447995507" },
+  "toger": { playStore: "https://play.google.com/store/apps/details?id=com.toger.app", appStore: "https://apps.apple.com/tr/app/toger-ara%C3%A7-%C5%9Farj-i-stasyon-a%C4%9F%C4%B1/id6449187134" },
+  "u-sarj": { playStore: "https://play.google.com/store/apps/details?id=com.usarj", appStore: null },
+  "zeplin": { playStore: "https://play.google.com/store/apps/details?id=com.doldurmobile.zeplin", appStore: "https://apps.apple.com/us/app/zeplin-energy/id6478288649" },
+  "q-charge": { playStore: "https://play.google.com/store/apps/details?id=com.meta.qcharge", appStore: "https://apps.apple.com/tr/app/q-charge-sarj-i-stasyon-a%C4%9F%C4%B1/id6446162797" },
+  "otowatt": { playStore: "https://play.google.com/store/apps/details?id=com.ipitex.otowatt", appStore: "https://apps.apple.com/tr/app/otowatt/id1598883799" },
+  "g-sarj": { playStore: "https://play.google.com/store/apps/details?id=com.gersan.gcharge", appStore: "https://apps.apple.com/sa/app/g-charge/id1667358064" },
+  "cw-enerji": { playStore: "https://play.google.com/store/apps/details?id=com.cw.chargingvehicles", appStore: "https://apps.apple.com/tr/app/cv-charging-vehicles/id6443815181" },
+  "tt-ventures": { playStore: "https://play.google.com/store/apps/details?id=com.arac.e4sarj", appStore: "https://apps.apple.com/us/app/e4%C5%9Farj/id6447972292" },
+  "ecoconnect": { playStore: "https://play.google.com/store/apps/details?id=com.raquun.econ", appStore: "https://apps.apple.com/us/app/econ/id6448791614" },
+  "borenco": { playStore: "https://play.google.com/store/apps/details?id=com.borencoevcharge", appStore: "https://apps.apple.com/tr/app/5-%C5%9Farj-nearby-charging-point/id6450214747" },
+  "ayhan": { playStore: "https://play.google.com/store/apps/details?id=com.ipitex.aostech", appStore: "https://apps.apple.com/tr/app/aos-technology/id6449093268" },
+  "kofteci-yusuf": { playStore: "https://play.google.com/store/apps/details?id=com.kofteciyusufsarj.mobile", appStore: "https://apps.apple.com/us/app/k%C3%B6fteci-yusuf-%C5%9Farj/id6473527360" },
+  "arsima-sarj": { playStore: "https://play.google.com/store/apps/details?id=com.arsimaenergy", appStore: "https://apps.apple.com/tr/app/arsima-energy/id6450647894" },
+};
+
 // [slug, chargeType, priceMin, priceMax, note, source, sourceUrl, isVerified]
 type PriceRow = [string, "AC"|"DC"|"HPC", number, number|null, string, string, string, boolean];
 
@@ -314,9 +377,14 @@ sqlite.exec("DELETE FROM price_history");
 sqlite.exec("DELETE FROM prices");
 sqlite.exec("DELETE FROM operators");
 
-// Insert operators
+// Insert operators with app links
 for (const op of operatorData) {
-  db.insert(operators).values(op).run();
+  const links = appLinks[op.slug];
+  db.insert(operators).values({
+    ...op,
+    playStoreUrl: links?.playStore ?? null,
+    appStoreUrl: links?.appStore ?? null,
+  }).run();
 }
 
 // Get operator IDs

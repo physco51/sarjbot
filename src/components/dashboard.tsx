@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import type { OperatorWithPrices } from "@/lib/types";
 import { OperatorCard } from "./operator-card";
+import { AppLinks } from "./app-store-badges";
 
 type SortKey = "price_asc" | "price_desc" | "name_asc" | "ac_asc" | "dc_asc" | "hpc_asc";
 type ViewMode = "grid" | "list";
@@ -225,6 +226,7 @@ export function Dashboard({
                 <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">AC (TL/kWh)</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">DC (TL/kWh)</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">HPC (TL/kWh)</th>
+                <th className="text-center px-4 py-3 text-xs font-semibold text-muted-foreground">Uygulama</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Kaynak</th>
               </tr>
             </thead>
@@ -269,6 +271,9 @@ export function Dashboard({
                     ) : (
                       <span className="text-muted-foreground/30">-</span>
                     )}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <AppLinks playStoreUrl={op.playStoreUrl} appStoreUrl={op.appStoreUrl} compact />
                   </td>
                   <td className="px-4 py-3 text-right text-[10px] text-muted-foreground/50 max-w-[120px] truncate">
                     {op.prices.AC?.source || op.prices.DC?.source || "-"}
