@@ -2,168 +2,175 @@
 
 import { useState, useMemo, useEffect } from "react";
 
-// maxAC: AC sarj hizi (kW), dcChargeMin: resmi DC hizli sarj suresi (dk), dcChargeRange: hangi aralik
-const VEHICLES: { name: string; batteryKWh: number; effWh: number; maxAC: number; maxDC: number; wltpKm: number; dcChargeMin: number | null; dcChargeRange: string }[] = [
+// heatPump: isi pompasi, batteryType: batarya tipi, warranty: garanti, cd: surtunum katsayisi
+const VEHICLES: {
+  name: string; batteryKWh: number; effWh: number; maxAC: number; maxDC: number;
+  wltpKm: number; dcChargeMin: number | null; dcChargeRange: string;
+  heatPump: boolean; batteryType: string; warranty: string; cd: number;
+}[] = [
   // Tesla
-  { name: "Tesla Model 3 SR+", batteryKWh: 60, effWh: 145, maxAC: 11, maxDC: 170, wltpKm: 410, dcChargeMin: 25, dcChargeRange: "10-80%" },
-  { name: "Tesla Model 3 LR", batteryKWh: 75, effWh: 150, maxAC: 11, maxDC: 250, wltpKm: 510, dcChargeMin: 25, dcChargeRange: "10-80%" },
-  { name: "Tesla Model 3 Performance", batteryKWh: 75, effWh: 160, maxAC: 11, maxDC: 250, wltpKm: 460, dcChargeMin: 25, dcChargeRange: "10-80%" },
-  { name: "Tesla Model Y RWD", batteryKWh: 60, effWh: 155, maxAC: 11, maxDC: 170, wltpKm: 390, dcChargeMin: 25, dcChargeRange: "10-80%" },
-  { name: "Tesla Model Y LR", batteryKWh: 75, effWh: 160, maxAC: 11, maxDC: 250, wltpKm: 480, dcChargeMin: 25, dcChargeRange: "10-80%" },
-  { name: "Tesla Model S LR", batteryKWh: 100, effWh: 180, maxAC: 11, maxDC: 250, wltpKm: 560, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "Tesla Model X LR", batteryKWh: 100, effWh: 200, maxAC: 11, maxDC: 250, wltpKm: 500, dcChargeMin: 30, dcChargeRange: "10-80%" },
+  { name: "Tesla Model 3 SR+", batteryKWh: 60, effWh: 145, maxAC: 11, maxDC: 170, wltpKm: 410, dcChargeMin: 25, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 160.000 km", cd: 0.23 },
+  { name: "Tesla Model 3 LR", batteryKWh: 75, effWh: 150, maxAC: 11, maxDC: 250, wltpKm: 510, dcChargeMin: 25, dcChargeRange: "10-80%", heatPump: true, batteryType: "NCA", warranty: "8 yil / 192.000 km", cd: 0.23 },
+  { name: "Tesla Model 3 Performance", batteryKWh: 75, effWh: 160, maxAC: 11, maxDC: 250, wltpKm: 460, dcChargeMin: 25, dcChargeRange: "10-80%", heatPump: true, batteryType: "NCA", warranty: "8 yil / 192.000 km", cd: 0.23 },
+  { name: "Tesla Model Y RWD", batteryKWh: 60, effWh: 155, maxAC: 11, maxDC: 170, wltpKm: 390, dcChargeMin: 25, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 160.000 km", cd: 0.26 },
+  { name: "Tesla Model Y LR", batteryKWh: 75, effWh: 160, maxAC: 11, maxDC: 250, wltpKm: 480, dcChargeMin: 25, dcChargeRange: "10-80%", heatPump: true, batteryType: "NCA", warranty: "8 yil / 192.000 km", cd: 0.26 },
+  { name: "Tesla Model S LR", batteryKWh: 100, effWh: 180, maxAC: 11, maxDC: 250, wltpKm: 560, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NCA", warranty: "8 yil / 240.000 km", cd: 0.208 },
+  { name: "Tesla Model X LR", batteryKWh: 100, effWh: 200, maxAC: 11, maxDC: 250, wltpKm: 500, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NCA", warranty: "8 yil / 240.000 km", cd: 0.24 },
   // Togg
-  { name: "Togg T10F Standart", batteryKWh: 52.4, effWh: 155, maxAC: 11, maxDC: 150, wltpKm: 327, dcChargeMin: 25, dcChargeRange: "10-80%" },
-  { name: "Togg T10F Uzun Menzil", batteryKWh: 88.5, effWh: 165, maxAC: 11, maxDC: 150, wltpKm: 535, dcChargeMin: 35, dcChargeRange: "10-80%" },
-  { name: "Togg T10X Uzun Menzil", batteryKWh: 88.5, effWh: 180, maxAC: 22, maxDC: 150, wltpKm: 492, dcChargeMin: 35, dcChargeRange: "10-80%" },
-  { name: "Togg T10X Standart", batteryKWh: 52.4, effWh: 170, maxAC: 22, maxDC: 150, wltpKm: 314, dcChargeMin: 25, dcChargeRange: "10-80%" },
+  { name: "Togg T10F Standart", batteryKWh: 52.4, effWh: 155, maxAC: 11, maxDC: 150, wltpKm: 327, dcChargeMin: 25, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.27 },
+  { name: "Togg T10F Uzun Menzil", batteryKWh: 88.5, effWh: 165, maxAC: 11, maxDC: 150, wltpKm: 535, dcChargeMin: 35, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.27 },
+  { name: "Togg T10X Uzun Menzil", batteryKWh: 88.5, effWh: 180, maxAC: 22, maxDC: 150, wltpKm: 492, dcChargeMin: 35, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Togg T10X Standart", batteryKWh: 52.4, effWh: 170, maxAC: 22, maxDC: 150, wltpKm: 314, dcChargeMin: 25, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
   // BMW
-  { name: "BMW i7 eDrive60", batteryKWh: 101.7, effWh: 199, maxAC: 11, maxDC: 195, wltpKm: 625, dcChargeMin: 34, dcChargeRange: "10-80%" },
-  { name: "BMW iX1 eDrive20", batteryKWh: 64.7, effWh: 165, maxAC: 11, maxDC: 130, wltpKm: 395, dcChargeMin: 29, dcChargeRange: "10-80%" },
-  { name: "BMW iX2 xDrive30", batteryKWh: 64.7, effWh: 167, maxAC: 11, maxDC: 130, wltpKm: 417, dcChargeMin: 29, dcChargeRange: "10-80%" },
-  { name: "BMW iX3", batteryKWh: 74, effWh: 180, maxAC: 11, maxDC: 150, wltpKm: 410, dcChargeMin: 32, dcChargeRange: "10-80%" },
-  { name: "BMW i4 eDrive40", batteryKWh: 83.9, effWh: 165, maxAC: 11, maxDC: 205, wltpKm: 510, dcChargeMin: 31, dcChargeRange: "10-80%" },
-  { name: "BMW i5 eDrive40", batteryKWh: 83.9, effWh: 175, maxAC: 11, maxDC: 205, wltpKm: 480, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "BMW iX xDrive40", batteryKWh: 76.6, effWh: 195, maxAC: 11, maxDC: 150, wltpKm: 395, dcChargeMin: 31, dcChargeRange: "10-80%" },
-  { name: "BMW iX xDrive50", batteryKWh: 111.5, effWh: 210, maxAC: 11, maxDC: 195, wltpKm: 530, dcChargeMin: 35, dcChargeRange: "10-80%" },
+  { name: "BMW i7 eDrive60", batteryKWh: 101.7, effWh: 199, maxAC: 11, maxDC: 195, wltpKm: 625, dcChargeMin: 34, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.24 },
+  { name: "BMW iX1 eDrive20", batteryKWh: 64.7, effWh: 165, maxAC: 11, maxDC: 130, wltpKm: 395, dcChargeMin: 29, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.26 },
+  { name: "BMW iX2 xDrive30", batteryKWh: 64.7, effWh: 167, maxAC: 11, maxDC: 130, wltpKm: 417, dcChargeMin: 29, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.26 },
+  { name: "BMW iX3", batteryKWh: 74, effWh: 180, maxAC: 11, maxDC: 150, wltpKm: 410, dcChargeMin: 32, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "BMW i4 eDrive40", batteryKWh: 83.9, effWh: 165, maxAC: 11, maxDC: 205, wltpKm: 510, dcChargeMin: 31, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.24 },
+  { name: "BMW i5 eDrive40", batteryKWh: 83.9, effWh: 175, maxAC: 11, maxDC: 205, wltpKm: 480, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.23 },
+  { name: "BMW iX xDrive40", batteryKWh: 76.6, effWh: 195, maxAC: 11, maxDC: 150, wltpKm: 395, dcChargeMin: 31, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.25 },
+  { name: "BMW iX xDrive50", batteryKWh: 111.5, effWh: 210, maxAC: 11, maxDC: 195, wltpKm: 530, dcChargeMin: 35, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.25 },
   // Mercedes
-  { name: "Mercedes EQA 250+", batteryKWh: 70.5, effWh: 175, maxAC: 11, maxDC: 100, wltpKm: 400, dcChargeMin: 32, dcChargeRange: "10-80%" },
-  { name: "Mercedes EQB 250+", batteryKWh: 70.5, effWh: 185, maxAC: 11, maxDC: 100, wltpKm: 380, dcChargeMin: 32, dcChargeRange: "10-80%" },
-  { name: "Mercedes EQC 400", batteryKWh: 80, effWh: 215, maxAC: 11, maxDC: 110, wltpKm: 370, dcChargeMin: 40, dcChargeRange: "10-80%" },
-  { name: "Mercedes EQE 350+", batteryKWh: 96, effWh: 175, maxAC: 11, maxDC: 170, wltpKm: 545, dcChargeMin: 32, dcChargeRange: "10-80%" },
-  { name: "Mercedes EQE SUV 350+", batteryKWh: 90.6, effWh: 201, maxAC: 11, maxDC: 170, wltpKm: 460, dcChargeMin: 32, dcChargeRange: "10-80%" },
-  { name: "Mercedes EQS 450+", batteryKWh: 107.8, effWh: 180, maxAC: 11, maxDC: 200, wltpKm: 600, dcChargeMin: 31, dcChargeRange: "10-80%" },
-  { name: "Mercedes EQS SUV 450+", batteryKWh: 108.4, effWh: 216, maxAC: 11, maxDC: 200, wltpKm: 507, dcChargeMin: 31, dcChargeRange: "10-80%" },
+  { name: "Mercedes EQA 250+", batteryKWh: 70.5, effWh: 175, maxAC: 11, maxDC: 100, wltpKm: 400, dcChargeMin: 32, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Mercedes EQB 250+", batteryKWh: 70.5, effWh: 185, maxAC: 11, maxDC: 100, wltpKm: 380, dcChargeMin: 32, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Mercedes EQC 400", batteryKWh: 80, effWh: 215, maxAC: 11, maxDC: 110, wltpKm: 370, dcChargeMin: 40, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Mercedes EQE 350+", batteryKWh: 96, effWh: 175, maxAC: 11, maxDC: 170, wltpKm: 545, dcChargeMin: 32, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "10 yil / 250.000 km", cd: 0.22 },
+  { name: "Mercedes EQE SUV 350+", batteryKWh: 90.6, effWh: 201, maxAC: 11, maxDC: 170, wltpKm: 460, dcChargeMin: 32, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "10 yil / 250.000 km", cd: 0.25 },
+  { name: "Mercedes EQS 450+", batteryKWh: 107.8, effWh: 180, maxAC: 11, maxDC: 200, wltpKm: 600, dcChargeMin: 31, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "10 yil / 250.000 km", cd: 0.2 },
+  { name: "Mercedes EQS SUV 450+", batteryKWh: 108.4, effWh: 216, maxAC: 11, maxDC: 200, wltpKm: 507, dcChargeMin: 31, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "10 yil / 250.000 km", cd: 0.26 },
   // Hyundai
-  { name: "Hyundai Inster", batteryKWh: 49, effWh: 139, maxAC: 11, maxDC: 85, wltpKm: 370, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "Hyundai Kona Electric", batteryKWh: 65.4, effWh: 150, maxAC: 11, maxDC: 100, wltpKm: 435, dcChargeMin: 41, dcChargeRange: "10-80%" },
-  { name: "Hyundai Ioniq 5 SR", batteryKWh: 58, effWh: 165, maxAC: 11, maxDC: 220, wltpKm: 354, dcChargeMin: 18, dcChargeRange: "10-80%" },
-  { name: "Hyundai Ioniq 5 LR", batteryKWh: 77.4, effWh: 170, maxAC: 11, maxDC: 240, wltpKm: 460, dcChargeMin: 18, dcChargeRange: "10-80%" },
-  { name: "Hyundai Ioniq 6 LR", batteryKWh: 77.4, effWh: 145, maxAC: 11, maxDC: 240, wltpKm: 535, dcChargeMin: 18, dcChargeRange: "10-80%" },
+  { name: "Hyundai Inster", batteryKWh: 49, effWh: 139, maxAC: 11, maxDC: 85, wltpKm: 370, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 160.000 km", cd: 0.31 },
+  { name: "Hyundai Kona Electric", batteryKWh: 65.4, effWh: 150, maxAC: 11, maxDC: 100, wltpKm: 435, dcChargeMin: 41, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Hyundai Ioniq 5 SR", batteryKWh: 58, effWh: 165, maxAC: 11, maxDC: 220, wltpKm: 354, dcChargeMin: 18, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Hyundai Ioniq 5 LR", batteryKWh: 77.4, effWh: 170, maxAC: 11, maxDC: 240, wltpKm: 460, dcChargeMin: 18, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Hyundai Ioniq 6 LR", batteryKWh: 77.4, effWh: 145, maxAC: 11, maxDC: 240, wltpKm: 535, dcChargeMin: 18, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.21 },
   // Kia
-  { name: "Kia EV3 Standard", batteryKWh: 58.3, effWh: 143, maxAC: 11, maxDC: 101, wltpKm: 410, dcChargeMin: 29, dcChargeRange: "10-80%" },
-  { name: "Kia EV3 Long Range", batteryKWh: 81.4, effWh: 148, maxAC: 11, maxDC: 128, wltpKm: 600, dcChargeMin: 31, dcChargeRange: "10-80%" },
-  { name: "Kia Niro EV", batteryKWh: 64.8, effWh: 155, maxAC: 11, maxDC: 80, wltpKm: 420, dcChargeMin: 43, dcChargeRange: "10-80%" },
-  { name: "Kia EV6 SR", batteryKWh: 58, effWh: 160, maxAC: 11, maxDC: 180, wltpKm: 360, dcChargeMin: 18, dcChargeRange: "10-80%" },
-  { name: "Kia EV6 LR", batteryKWh: 77.4, effWh: 165, maxAC: 11, maxDC: 240, wltpKm: 470, dcChargeMin: 18, dcChargeRange: "10-80%" },
-  { name: "Kia EV9 LR", batteryKWh: 99.8, effWh: 215, maxAC: 11, maxDC: 240, wltpKm: 465, dcChargeMin: 24, dcChargeRange: "10-80%" },
+  { name: "Kia EV3 Standard", batteryKWh: 58.3, effWh: 143, maxAC: 11, maxDC: 101, wltpKm: 410, dcChargeMin: 29, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.28 },
+  { name: "Kia EV3 Long Range", batteryKWh: 81.4, effWh: 148, maxAC: 11, maxDC: 128, wltpKm: 600, dcChargeMin: 31, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.28 },
+  { name: "Kia Niro EV", batteryKWh: 64.8, effWh: 155, maxAC: 11, maxDC: 80, wltpKm: 420, dcChargeMin: 43, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.29 },
+  { name: "Kia EV6 SR", batteryKWh: 58, effWh: 160, maxAC: 11, maxDC: 180, wltpKm: 360, dcChargeMin: 18, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.28 },
+  { name: "Kia EV6 LR", batteryKWh: 77.4, effWh: 165, maxAC: 11, maxDC: 240, wltpKm: 470, dcChargeMin: 18, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.28 },
+  { name: "Kia EV9 LR", batteryKWh: 99.8, effWh: 215, maxAC: 11, maxDC: 240, wltpKm: 465, dcChargeMin: 24, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.28 },
   // Volkswagen
-  { name: "VW ID.3 Pro", batteryKWh: 58, effWh: 155, maxAC: 11, maxDC: 120, wltpKm: 375, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "VW ID.3 Pro S", batteryKWh: 77, effWh: 160, maxAC: 11, maxDC: 170, wltpKm: 480, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "VW ID.4 Pro", batteryKWh: 77, effWh: 175, maxAC: 11, maxDC: 135, wltpKm: 440, dcChargeMin: 36, dcChargeRange: "10-80%" },
-  { name: "VW ID.5 GTX", batteryKWh: 77, effWh: 180, maxAC: 11, maxDC: 150, wltpKm: 430, dcChargeMin: 33, dcChargeRange: "10-80%" },
-  { name: "VW ID.7 Pro S", batteryKWh: 86, effWh: 160, maxAC: 11, maxDC: 200, wltpKm: 540, dcChargeMin: 26, dcChargeRange: "10-80%" },
-  { name: "VW ID.Buzz Pro", batteryKWh: 82, effWh: 210, maxAC: 11, maxDC: 185, wltpKm: 390, dcChargeMin: 30, dcChargeRange: "10-80%" },
+  { name: "VW ID.3 Pro", batteryKWh: 58, effWh: 155, maxAC: 11, maxDC: 120, wltpKm: 375, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.26 },
+  { name: "VW ID.3 Pro S", batteryKWh: 77, effWh: 160, maxAC: 11, maxDC: 170, wltpKm: 480, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.26 },
+  { name: "VW ID.4 Pro", batteryKWh: 77, effWh: 175, maxAC: 11, maxDC: 135, wltpKm: 440, dcChargeMin: 36, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "VW ID.5 GTX", batteryKWh: 77, effWh: 180, maxAC: 11, maxDC: 150, wltpKm: 430, dcChargeMin: 33, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.26 },
+  { name: "VW ID.7 Pro S", batteryKWh: 86, effWh: 160, maxAC: 11, maxDC: 200, wltpKm: 540, dcChargeMin: 26, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.23 },
+  { name: "VW ID.Buzz Pro", batteryKWh: 82, effWh: 210, maxAC: 11, maxDC: 185, wltpKm: 390, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
   // Renault
-  { name: "Renault Megane E-Tech EV60", batteryKWh: 60, effWh: 155, maxAC: 22, maxDC: 130, wltpKm: 385, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "Renault Scenic E-Tech EV87", batteryKWh: 87, effWh: 170, maxAC: 22, maxDC: 150, wltpKm: 510, dcChargeMin: 37, dcChargeRange: "10-80%" },
-  { name: "Renault Zoe R135", batteryKWh: 52, effWh: 145, maxAC: 22, maxDC: 50, wltpKm: 360, dcChargeMin: 55, dcChargeRange: "10-80%" },
+  { name: "Renault Megane E-Tech EV60", batteryKWh: 60, effWh: 155, maxAC: 22, maxDC: 130, wltpKm: 385, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Renault Scenic E-Tech EV87", batteryKWh: 87, effWh: 170, maxAC: 22, maxDC: 150, wltpKm: 510, dcChargeMin: 37, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Renault Zoe R135", batteryKWh: 52, effWh: 145, maxAC: 22, maxDC: 50, wltpKm: 360, dcChargeMin: 55, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
   // Citroen
-  { name: "Citroen Ami", batteryKWh: 5.5, effWh: 69, maxAC: 1.8, maxDC: 0, wltpKm: 75, dcChargeMin: null, dcChargeRange: "-" },
-  { name: "Citroen e-C3", batteryKWh: 44, effWh: 148, maxAC: 7.4, maxDC: 100, wltpKm: 300, dcChargeMin: 26, dcChargeRange: "20-80%" },
-  { name: "Citroen e-C3 Aircross", batteryKWh: 44, effWh: 160, maxAC: 7.4, maxDC: 100, wltpKm: 306, dcChargeMin: 26, dcChargeRange: "20-80%" },
-  { name: "Citroen e-C4", batteryKWh: 50, effWh: 160, maxAC: 11, maxDC: 100, wltpKm: 315, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Citroen e-C4 X", batteryKWh: 50, effWh: 158, maxAC: 7.4, maxDC: 100, wltpKm: 320, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Citroen e-C5 Aircross", batteryKWh: 73, effWh: 175, maxAC: 11, maxDC: 160, wltpKm: 415, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Citroen e-Berlingo", batteryKWh: 50, effWh: 190, maxAC: 11, maxDC: 100, wltpKm: 265, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Citroen e-SpaceTourer", batteryKWh: 75, effWh: 250, maxAC: 11, maxDC: 100, wltpKm: 300, dcChargeMin: 45, dcChargeRange: "20-80%" },
+  { name: "Citroen Ami", batteryKWh: 5.5, effWh: 69, maxAC: 1.8, maxDC: 0, wltpKm: 75, dcChargeMin: null, dcChargeRange: "-", heatPump: false, batteryType: "LFP", warranty: "8 yil / 100.000 km", cd: 0.48 },
+  { name: "Citroen e-C3", batteryKWh: 44, effWh: 148, maxAC: 7.4, maxDC: 100, wltpKm: 300, dcChargeMin: 26, dcChargeRange: "20-80%", heatPump: false, batteryType: "LFP", warranty: "8 yil / 160.000 km", cd: 0.32 },
+  { name: "Citroen e-C3 Aircross", batteryKWh: 44, effWh: 160, maxAC: 7.4, maxDC: 100, wltpKm: 306, dcChargeMin: 26, dcChargeRange: "20-80%", heatPump: false, batteryType: "LFP", warranty: "8 yil / 160.000 km", cd: 0.32 },
+  { name: "Citroen e-C3 Aircross LR", batteryKWh: 54, effWh: 160, maxAC: 11, maxDC: 100, wltpKm: 400, dcChargeMin: 27, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.32 },
+  { name: "Citroen e-C4", batteryKWh: 50, effWh: 160, maxAC: 11, maxDC: 100, wltpKm: 315, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Citroen e-C4 X", batteryKWh: 50, effWh: 158, maxAC: 7.4, maxDC: 100, wltpKm: 320, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Citroen e-C5 Aircross", batteryKWh: 73, effWh: 175, maxAC: 11, maxDC: 160, wltpKm: 415, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Citroen e-Berlingo", batteryKWh: 50, effWh: 190, maxAC: 11, maxDC: 100, wltpKm: 265, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.32 },
+  { name: "Citroen e-SpaceTourer", batteryKWh: 75, effWh: 250, maxAC: 11, maxDC: 100, wltpKm: 300, dcChargeMin: 45, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.31 },
   // Peugeot
-  { name: "Peugeot e-208", batteryKWh: 50, effWh: 150, maxAC: 11, maxDC: 100, wltpKm: 335, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Peugeot e-2008", batteryKWh: 50, effWh: 165, maxAC: 11, maxDC: 100, wltpKm: 305, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Peugeot e-308", batteryKWh: 54, effWh: 155, maxAC: 11, maxDC: 100, wltpKm: 350, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Peugeot e-3008", batteryKWh: 73, effWh: 170, maxAC: 11, maxDC: 160, wltpKm: 430, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Peugeot e-5008", batteryKWh: 73, effWh: 171, maxAC: 11, maxDC: 160, wltpKm: 502, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Peugeot e-Traveller", batteryKWh: 75, effWh: 237, maxAC: 11, maxDC: 100, wltpKm: 322, dcChargeMin: 45, dcChargeRange: "20-80%" },
+  { name: "Peugeot e-208", batteryKWh: 50, effWh: 150, maxAC: 11, maxDC: 100, wltpKm: 335, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Peugeot e-2008", batteryKWh: 50, effWh: 165, maxAC: 11, maxDC: 100, wltpKm: 305, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.31 },
+  { name: "Peugeot e-308", batteryKWh: 54, effWh: 155, maxAC: 11, maxDC: 100, wltpKm: 350, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Peugeot e-3008", batteryKWh: 73, effWh: 170, maxAC: 11, maxDC: 160, wltpKm: 430, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Peugeot e-5008", batteryKWh: 73, effWh: 171, maxAC: 11, maxDC: 160, wltpKm: 502, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Peugeot e-Traveller", batteryKWh: 75, effWh: 237, maxAC: 11, maxDC: 100, wltpKm: 322, dcChargeMin: 45, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.31 },
   // Opel
-  { name: "Opel Corsa Electric", batteryKWh: 50, effWh: 150, maxAC: 11, maxDC: 100, wltpKm: 335, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Opel Mokka Electric", batteryKWh: 50, effWh: 165, maxAC: 11, maxDC: 100, wltpKm: 305, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Opel Astra Electric", batteryKWh: 54, effWh: 158, maxAC: 11, maxDC: 100, wltpKm: 345, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Opel Frontera Electric", batteryKWh: 44, effWh: 161, maxAC: 7.4, maxDC: 100, wltpKm: 305, dcChargeMin: 26, dcChargeRange: "20-80%" },
-  { name: "Opel Grandland Electric", batteryKWh: 73, effWh: 170, maxAC: 11, maxDC: 160, wltpKm: 523, dcChargeMin: 30, dcChargeRange: "20-80%" },
+  { name: "Opel Corsa Electric", batteryKWh: 50, effWh: 150, maxAC: 11, maxDC: 100, wltpKm: 335, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
+  { name: "Opel Mokka Electric", batteryKWh: 50, effWh: 165, maxAC: 11, maxDC: 100, wltpKm: 305, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.32 },
+  { name: "Opel Astra Electric", batteryKWh: 54, effWh: 158, maxAC: 11, maxDC: 100, wltpKm: 345, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Opel Frontera Electric", batteryKWh: 44, effWh: 161, maxAC: 7.4, maxDC: 100, wltpKm: 305, dcChargeMin: 26, dcChargeRange: "20-80%", heatPump: false, batteryType: "LFP", warranty: "8 yil / 160.000 km", cd: 0.32 },
+  { name: "Opel Grandland Electric", batteryKWh: 73, effWh: 170, maxAC: 11, maxDC: 160, wltpKm: 523, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
   // Fiat
-  { name: "Fiat 500e", batteryKWh: 42, effWh: 140, maxAC: 11, maxDC: 85, wltpKm: 300, dcChargeMin: 35, dcChargeRange: "20-80%" },
-  { name: "Fiat 600e", batteryKWh: 54, effWh: 160, maxAC: 11, maxDC: 100, wltpKm: 340, dcChargeMin: 30, dcChargeRange: "20-80%" },
-  { name: "Fiat Grande Panda Electric", batteryKWh: 44, effWh: 155, maxAC: 7.4, maxDC: 100, wltpKm: 320, dcChargeMin: 27, dcChargeRange: "20-80%" },
+  { name: "Fiat 500e", batteryKWh: 42, effWh: 140, maxAC: 11, maxDC: 85, wltpKm: 300, dcChargeMin: 35, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.31 },
+  { name: "Fiat 600e", batteryKWh: 54, effWh: 160, maxAC: 11, maxDC: 100, wltpKm: 340, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.31 },
+  { name: "Fiat Grande Panda Electric", batteryKWh: 44, effWh: 155, maxAC: 7.4, maxDC: 100, wltpKm: 320, dcChargeMin: 27, dcChargeRange: "20-80%", heatPump: false, batteryType: "LFP", warranty: "8 yil / 160.000 km", cd: 0.32 },
   // BYD
-  { name: "BYD Atto 2", batteryKWh: 45.1, effWh: 148, maxAC: 6.6, maxDC: 70, wltpKm: 305, dcChargeMin: 35, dcChargeRange: "10-80%" },
-  { name: "BYD Atto 3", batteryKWh: 60.5, effWh: 170, maxAC: 7, maxDC: 88, wltpKm: 356, dcChargeMin: 37, dcChargeRange: "10-80%" },
-  { name: "BYD Dolphin", batteryKWh: 60.5, effWh: 148, maxAC: 7, maxDC: 88, wltpKm: 410, dcChargeMin: 37, dcChargeRange: "10-80%" },
-  { name: "BYD Seal", batteryKWh: 82.5, effWh: 160, maxAC: 7, maxDC: 150, wltpKm: 516, dcChargeMin: 33, dcChargeRange: "10-80%" },
-  { name: "BYD Seal U", batteryKWh: 87.0, effWh: 180, maxAC: 7, maxDC: 140, wltpKm: 483, dcChargeMin: 38, dcChargeRange: "10-80%" },
-  { name: "BYD Han", batteryKWh: 85.4, effWh: 175, maxAC: 7, maxDC: 120, wltpKm: 490, dcChargeMin: 37, dcChargeRange: "10-80%" },
-  { name: "BYD Tang EV", batteryKWh: 108.8, effWh: 220, maxAC: 7, maxDC: 166, wltpKm: 495, dcChargeMin: 40, dcChargeRange: "10-80%" },
+  { name: "BYD Atto 2", batteryKWh: 45.1, effWh: 148, maxAC: 6.6, maxDC: 70, wltpKm: 305, dcChargeMin: 35, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 200.000 km", cd: 0.31 },
+  { name: "BYD Atto 3", batteryKWh: 60.5, effWh: 170, maxAC: 7, maxDC: 88, wltpKm: 356, dcChargeMin: 37, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 200.000 km", cd: 0.29 },
+  { name: "BYD Dolphin", batteryKWh: 60.5, effWh: 148, maxAC: 7, maxDC: 88, wltpKm: 410, dcChargeMin: 37, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 200.000 km", cd: 0.29 },
+  { name: "BYD Seal", batteryKWh: 82.5, effWh: 160, maxAC: 7, maxDC: 150, wltpKm: 516, dcChargeMin: 33, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 200.000 km", cd: 0.22 },
+  { name: "BYD Seal U", batteryKWh: 87.0, effWh: 180, maxAC: 7, maxDC: 140, wltpKm: 483, dcChargeMin: 38, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 200.000 km", cd: 0.22 },
+  { name: "BYD Han", batteryKWh: 85.4, effWh: 175, maxAC: 7, maxDC: 120, wltpKm: 490, dcChargeMin: 37, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 200.000 km", cd: 0.23 },
+  { name: "BYD Tang EV", batteryKWh: 108.8, effWh: 220, maxAC: 7, maxDC: 166, wltpKm: 495, dcChargeMin: 40, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 200.000 km", cd: 0.29 },
   // MG
-  { name: "MG4 Standard", batteryKWh: 51, effWh: 155, maxAC: 11, maxDC: 117, wltpKm: 330, dcChargeMin: 26, dcChargeRange: "10-80%" },
-  { name: "MG4 Long Range", batteryKWh: 64, effWh: 160, maxAC: 11, maxDC: 135, wltpKm: 400, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "MG4 XPower", batteryKWh: 64, effWh: 170, maxAC: 11, maxDC: 135, wltpKm: 375, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "MG Marvel R", batteryKWh: 70, effWh: 185, maxAC: 11, maxDC: 92, wltpKm: 380, dcChargeMin: 43, dcChargeRange: "10-80%" },
-  { name: "MG ZS EV", batteryKWh: 72.6, effWh: 175, maxAC: 11, maxDC: 92, wltpKm: 415, dcChargeMin: 42, dcChargeRange: "10-80%" },
+  { name: "MG4 Standard", batteryKWh: 51, effWh: 155, maxAC: 11, maxDC: 117, wltpKm: 330, dcChargeMin: 26, dcChargeRange: "10-80%", heatPump: false, batteryType: "LFP", warranty: "7 yil / 150.000 km", cd: 0.27 },
+  { name: "MG4 Long Range", batteryKWh: 64, effWh: 160, maxAC: 11, maxDC: 135, wltpKm: 400, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.27 },
+  { name: "MG4 XPower", batteryKWh: 64, effWh: 170, maxAC: 11, maxDC: 135, wltpKm: 375, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.27 },
+  { name: "MG Marvel R", batteryKWh: 70, effWh: 185, maxAC: 11, maxDC: 92, wltpKm: 380, dcChargeMin: 43, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.29 },
+  { name: "MG ZS EV", batteryKWh: 72.6, effWh: 175, maxAC: 11, maxDC: 92, wltpKm: 415, dcChargeMin: 42, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "7 yil / 150.000 km", cd: 0.33 },
   // Volvo
-  { name: "Volvo EX30 SR", batteryKWh: 51, effWh: 150, maxAC: 11, maxDC: 134, wltpKm: 340, dcChargeMin: 25, dcChargeRange: "10-80%" },
-  { name: "Volvo EX30 LR", batteryKWh: 69, effWh: 155, maxAC: 11, maxDC: 153, wltpKm: 445, dcChargeMin: 26, dcChargeRange: "10-80%" },
-  { name: "Volvo EX40 (XC40 Recharge)", batteryKWh: 82, effWh: 185, maxAC: 11, maxDC: 200, wltpKm: 440, dcChargeMin: 28, dcChargeRange: "10-80%" },
-  { name: "Volvo EC40 (C40 Recharge)", batteryKWh: 82, effWh: 180, maxAC: 11, maxDC: 200, wltpKm: 455, dcChargeMin: 28, dcChargeRange: "10-80%" },
-  { name: "Volvo EX90 Twin Motor", batteryKWh: 111, effWh: 210, maxAC: 11, maxDC: 250, wltpKm: 530, dcChargeMin: 30, dcChargeRange: "10-80%" },
+  { name: "Volvo EX30 SR", batteryKWh: 51, effWh: 150, maxAC: 11, maxDC: 134, wltpKm: 340, dcChargeMin: 25, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Volvo EX30 LR", batteryKWh: 69, effWh: 155, maxAC: 11, maxDC: 153, wltpKm: 445, dcChargeMin: 26, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Volvo EX40 (XC40 Recharge)", batteryKWh: 82, effWh: 185, maxAC: 11, maxDC: 200, wltpKm: 440, dcChargeMin: 28, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.32 },
+  { name: "Volvo EC40 (C40 Recharge)", batteryKWh: 82, effWh: 180, maxAC: 11, maxDC: 200, wltpKm: 455, dcChargeMin: 28, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Volvo EX90 Twin Motor", batteryKWh: 111, effWh: 210, maxAC: 11, maxDC: 250, wltpKm: 530, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
   // Cupra / SEAT
-  { name: "Cupra Born 58 kWh", batteryKWh: 58, effWh: 155, maxAC: 11, maxDC: 120, wltpKm: 375, dcChargeMin: 29, dcChargeRange: "10-80%" },
-  { name: "Cupra Born 77 kWh", batteryKWh: 77, effWh: 160, maxAC: 11, maxDC: 170, wltpKm: 480, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "Cupra Tavascan", batteryKWh: 77, effWh: 180, maxAC: 11, maxDC: 135, wltpKm: 430, dcChargeMin: 36, dcChargeRange: "10-80%" },
+  { name: "Cupra Born 58 kWh", batteryKWh: 58, effWh: 155, maxAC: 11, maxDC: 120, wltpKm: 375, dcChargeMin: 29, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.27 },
+  { name: "Cupra Born 77 kWh", batteryKWh: 77, effWh: 160, maxAC: 11, maxDC: 170, wltpKm: 480, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.27 },
+  { name: "Cupra Tavascan", batteryKWh: 77, effWh: 180, maxAC: 11, maxDC: 135, wltpKm: 430, dcChargeMin: 36, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.27 },
   // Skoda
-  { name: "Skoda Enyaq iV 60", batteryKWh: 58, effWh: 165, maxAC: 11, maxDC: 120, wltpKm: 355, dcChargeMin: 29, dcChargeRange: "10-80%" },
-  { name: "Skoda Enyaq iV 80", batteryKWh: 77, effWh: 170, maxAC: 11, maxDC: 135, wltpKm: 455, dcChargeMin: 36, dcChargeRange: "10-80%" },
-  { name: "Skoda Enyaq Coupe RS", batteryKWh: 77, effWh: 175, maxAC: 11, maxDC: 175, wltpKm: 440, dcChargeMin: 29, dcChargeRange: "10-80%" },
+  { name: "Skoda Enyaq iV 60", batteryKWh: 58, effWh: 165, maxAC: 11, maxDC: 120, wltpKm: 355, dcChargeMin: 29, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.26 },
+  { name: "Skoda Enyaq iV 80", batteryKWh: 77, effWh: 170, maxAC: 11, maxDC: 135, wltpKm: 455, dcChargeMin: 36, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.26 },
+  { name: "Skoda Enyaq Coupe RS", batteryKWh: 77, effWh: 175, maxAC: 11, maxDC: 175, wltpKm: 440, dcChargeMin: 29, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.23 },
   // Audi
-  { name: "Audi Q4 e-tron 40", batteryKWh: 76.6, effWh: 175, maxAC: 11, maxDC: 135, wltpKm: 440, dcChargeMin: 36, dcChargeRange: "10-80%" },
-  { name: "Audi Q4 e-tron 50", batteryKWh: 76.6, effWh: 185, maxAC: 11, maxDC: 175, wltpKm: 415, dcChargeMin: 28, dcChargeRange: "10-80%" },
-  { name: "Audi Q8 e-tron 55", batteryKWh: 114, effWh: 210, maxAC: 11, maxDC: 170, wltpKm: 540, dcChargeMin: 31, dcChargeRange: "10-80%" },
-  { name: "Audi e-tron GT", batteryKWh: 93.4, effWh: 195, maxAC: 11, maxDC: 270, wltpKm: 480, dcChargeMin: 23, dcChargeRange: "10-80%" },
+  { name: "Audi Q4 e-tron 40", batteryKWh: 76.6, effWh: 175, maxAC: 11, maxDC: 135, wltpKm: 440, dcChargeMin: 36, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Audi Q4 e-tron 50", batteryKWh: 76.6, effWh: 185, maxAC: 11, maxDC: 175, wltpKm: 415, dcChargeMin: 28, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Audi Q8 e-tron 55", batteryKWh: 114, effWh: 210, maxAC: 11, maxDC: 170, wltpKm: 540, dcChargeMin: 31, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Audi e-tron GT", batteryKWh: 93.4, effWh: 195, maxAC: 11, maxDC: 270, wltpKm: 480, dcChargeMin: 23, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.24 },
   // Porsche
-  { name: "Porsche Taycan", batteryKWh: 79.2, effWh: 190, maxAC: 11, maxDC: 270, wltpKm: 415, dcChargeMin: 22, dcChargeRange: "10-80%" },
-  { name: "Porsche Taycan Performance", batteryKWh: 93.4, effWh: 200, maxAC: 11, maxDC: 270, wltpKm: 465, dcChargeMin: 22, dcChargeRange: "10-80%" },
-  { name: "Porsche Macan Electric", batteryKWh: 100, effWh: 195, maxAC: 11, maxDC: 270, wltpKm: 510, dcChargeMin: 22, dcChargeRange: "10-80%" },
+  { name: "Porsche Taycan", batteryKWh: 79.2, effWh: 190, maxAC: 11, maxDC: 270, wltpKm: 415, dcChargeMin: 22, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.22 },
+  { name: "Porsche Taycan Performance", batteryKWh: 93.4, effWh: 200, maxAC: 11, maxDC: 270, wltpKm: 465, dcChargeMin: 22, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.22 },
+  { name: "Porsche Macan Electric", batteryKWh: 100, effWh: 195, maxAC: 11, maxDC: 270, wltpKm: 510, dcChargeMin: 22, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.25 },
   // Nissan
-  { name: "Nissan Leaf 40 kWh", batteryKWh: 40, effWh: 155, maxAC: 6.6, maxDC: 50, wltpKm: 258, dcChargeMin: 40, dcChargeRange: "20-80%" },
-  { name: "Nissan Leaf e+ 62 kWh", batteryKWh: 62, effWh: 165, maxAC: 6.6, maxDC: 100, wltpKm: 375, dcChargeMin: 40, dcChargeRange: "20-80%" },
-  { name: "Nissan Ariya 63 kWh", batteryKWh: 63, effWh: 165, maxAC: 22, maxDC: 130, wltpKm: 380, dcChargeMin: 28, dcChargeRange: "10-80%" },
-  { name: "Nissan Ariya 87 kWh", batteryKWh: 87, effWh: 175, maxAC: 22, maxDC: 130, wltpKm: 495, dcChargeMin: 35, dcChargeRange: "10-80%" },
+  { name: "Nissan Leaf 40 kWh", batteryKWh: 40, effWh: 155, maxAC: 6.6, maxDC: 50, wltpKm: 258, dcChargeMin: 40, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Nissan Leaf e+ 62 kWh", batteryKWh: 62, effWh: 165, maxAC: 6.6, maxDC: 100, wltpKm: 375, dcChargeMin: 40, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Nissan Ariya 63 kWh", batteryKWh: 63, effWh: 165, maxAC: 22, maxDC: 130, wltpKm: 380, dcChargeMin: 28, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.3 },
+  { name: "Nissan Ariya 87 kWh", batteryKWh: 87, effWh: 175, maxAC: 22, maxDC: 130, wltpKm: 495, dcChargeMin: 35, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.3 },
   // Toyota / Lexus
-  { name: "Toyota bZ4X", batteryKWh: 71.4, effWh: 175, maxAC: 6.6, maxDC: 150, wltpKm: 410, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "Lexus RZ 450e", batteryKWh: 71.4, effWh: 185, maxAC: 11, maxDC: 150, wltpKm: 385, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "Lexus UX 300e", batteryKWh: 72.8, effWh: 175, maxAC: 6.6, maxDC: 150, wltpKm: 415, dcChargeMin: 30, dcChargeRange: "10-80%" },
+  { name: "Toyota bZ4X", batteryKWh: 71.4, effWh: 175, maxAC: 6.6, maxDC: 150, wltpKm: 410, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Lexus RZ 450e", batteryKWh: 71.4, effWh: 185, maxAC: 11, maxDC: 150, wltpKm: 385, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Lexus UX 300e", batteryKWh: 72.8, effWh: 175, maxAC: 6.6, maxDC: 150, wltpKm: 415, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.3 },
   // Ford
-  { name: "Ford Mustang Mach-E SR", batteryKWh: 70, effWh: 175, maxAC: 11, maxDC: 115, wltpKm: 400, dcChargeMin: 38, dcChargeRange: "10-80%" },
-  { name: "Ford Mustang Mach-E LR", batteryKWh: 91, effWh: 180, maxAC: 11, maxDC: 150, wltpKm: 505, dcChargeMin: 36, dcChargeRange: "10-80%" },
-  { name: "Ford Explorer Electric", batteryKWh: 77, effWh: 175, maxAC: 11, maxDC: 185, wltpKm: 440, dcChargeMin: 26, dcChargeRange: "10-80%" },
+  { name: "Ford Mustang Mach-E SR", batteryKWh: 70, effWh: 175, maxAC: 11, maxDC: 115, wltpKm: 400, dcChargeMin: 38, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.27 },
+  { name: "Ford Mustang Mach-E LR", batteryKWh: 91, effWh: 180, maxAC: 11, maxDC: 150, wltpKm: 505, dcChargeMin: 36, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.27 },
+  { name: "Ford Explorer Electric", batteryKWh: 77, effWh: 175, maxAC: 11, maxDC: 185, wltpKm: 440, dcChargeMin: 26, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
   // Mini / Smart
-  { name: "Mini Cooper SE", batteryKWh: 54.2, effWh: 155, maxAC: 11, maxDC: 95, wltpKm: 350, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "Mini Countryman SE ALL4", batteryKWh: 66.5, effWh: 175, maxAC: 11, maxDC: 130, wltpKm: 380, dcChargeMin: 29, dcChargeRange: "10-80%" },
-  { name: "Smart #1 Pro+", batteryKWh: 66, effWh: 165, maxAC: 22, maxDC: 150, wltpKm: 400, dcChargeMin: 30, dcChargeRange: "10-80%" },
-  { name: "Smart #3", batteryKWh: 66, effWh: 170, maxAC: 22, maxDC: 150, wltpKm: 390, dcChargeMin: 30, dcChargeRange: "10-80%" },
+  { name: "Mini Cooper SE", batteryKWh: 54.2, effWh: 155, maxAC: 11, maxDC: 95, wltpKm: 350, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
+  { name: "Mini Countryman SE ALL4", batteryKWh: 66.5, effWh: 175, maxAC: 11, maxDC: 130, wltpKm: 380, dcChargeMin: 29, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.26 },
+  { name: "Smart #1 Pro+", batteryKWh: 66, effWh: 165, maxAC: 22, maxDC: 150, wltpKm: 400, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 150.000 km", cd: 0.29 },
+  { name: "Smart #3", batteryKWh: 66, effWh: 170, maxAC: 22, maxDC: 150, wltpKm: 390, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 150.000 km", cd: 0.27 },
   // Dacia
-  { name: "Dacia Spring Electric", batteryKWh: 26.8, effWh: 140, maxAC: 7.4, maxDC: 30, wltpKm: 190, dcChargeMin: 56, dcChargeRange: "20-80%" },
+  { name: "Dacia Spring Electric", batteryKWh: 26.8, effWh: 140, maxAC: 7.4, maxDC: 30, wltpKm: 190, dcChargeMin: 56, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 120.000 km", cd: 0.33 },
   // Jaguar
-  { name: "Jaguar I-Pace", batteryKWh: 90, effWh: 220, maxAC: 11, maxDC: 104, wltpKm: 410, dcChargeMin: 45, dcChargeRange: "10-80%" },
+  { name: "Jaguar I-Pace", batteryKWh: 90, effWh: 220, maxAC: 11, maxDC: 104, wltpKm: 410, dcChargeMin: 45, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.29 },
   // Alfa Romeo
-  { name: "Alfa Romeo Junior Elettrica", batteryKWh: 54, effWh: 155, maxAC: 11, maxDC: 100, wltpKm: 410, dcChargeMin: 30, dcChargeRange: "20-80%" },
+  { name: "Alfa Romeo Junior Elettrica", batteryKWh: 54, effWh: 155, maxAC: 11, maxDC: 100, wltpKm: 410, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
   // DS
-  { name: "DS3 E-Tense", batteryKWh: 54, effWh: 156, maxAC: 11, maxDC: 100, wltpKm: 402, dcChargeMin: 30, dcChargeRange: "20-80%" },
+  { name: "DS3 E-Tense", batteryKWh: 54, effWh: 156, maxAC: 11, maxDC: 100, wltpKm: 402, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.28 },
   // Honda
-  { name: "Honda e:Ny1", batteryKWh: 68.8, effWh: 179, maxAC: 11, maxDC: 78, wltpKm: 412, dcChargeMin: 45, dcChargeRange: "10-80%" },
+  { name: "Honda e:Ny1", batteryKWh: 68.8, effWh: 179, maxAC: 11, maxDC: 78, wltpKm: 412, dcChargeMin: 45, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.3 },
   // Leapmotor (Stellantis)
-  { name: "Leapmotor T03", batteryKWh: 37.3, effWh: 135, maxAC: 6.6, maxDC: 48, wltpKm: 265, dcChargeMin: 36, dcChargeRange: "20-80%" },
-  { name: "Leapmotor C10", batteryKWh: 69.9, effWh: 161, maxAC: 11, maxDC: 84, wltpKm: 420, dcChargeMin: 30, dcChargeRange: "20-80%" },
+  { name: "Leapmotor T03", batteryKWh: 37.3, effWh: 135, maxAC: 6.6, maxDC: 48, wltpKm: 265, dcChargeMin: 36, dcChargeRange: "20-80%", heatPump: false, batteryType: "LFP", warranty: "8 yil / 150.000 km", cd: 0.33 },
+  { name: "Leapmotor C10", batteryKWh: 69.9, effWh: 161, maxAC: 11, maxDC: 84, wltpKm: 420, dcChargeMin: 30, dcChargeRange: "20-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 150.000 km", cd: 0.27 },
   // GWM ORA
-  { name: "GWM ORA 03", batteryKWh: 48, effWh: 155, maxAC: 6.6, maxDC: 67, wltpKm: 310, dcChargeMin: 38, dcChargeRange: "10-80%" },
-  { name: "GWM ORA 07", batteryKWh: 63.5, effWh: 163, maxAC: 11, maxDC: 80, wltpKm: 440, dcChargeMin: 42, dcChargeRange: "10-80%" },
+  { name: "GWM ORA 03", batteryKWh: 48, effWh: 155, maxAC: 6.6, maxDC: 67, wltpKm: 310, dcChargeMin: 38, dcChargeRange: "10-80%", heatPump: false, batteryType: "LFP", warranty: "8 yil / 150.000 km", cd: 0.3 },
+  { name: "GWM ORA 07", batteryKWh: 63.5, effWh: 163, maxAC: 11, maxDC: 80, wltpKm: 440, dcChargeMin: 42, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 150.000 km", cd: 0.27 },
   // Skywell
-  { name: "Skywell ET5", batteryKWh: 72, effWh: 175, maxAC: 6.6, maxDC: 60, wltpKm: 400, dcChargeMin: 60, dcChargeRange: "20-80%" },
+  { name: "Skywell ET5", batteryKWh: 72, effWh: 175, maxAC: 6.6, maxDC: 60, wltpKm: 400, dcChargeMin: 60, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "5 yil / 150.000 km", cd: 0.31 },
   // Seres
-  { name: "Seres 3", batteryKWh: 52, effWh: 170, maxAC: 6.6, maxDC: 80, wltpKm: 305, dcChargeMin: 35, dcChargeRange: "20-80%" },
-  { name: "Seres 5", batteryKWh: 80, effWh: 180, maxAC: 11, maxDC: 150, wltpKm: 445, dcChargeMin: 30, dcChargeRange: "10-80%" },
+  { name: "Seres 3", batteryKWh: 52, effWh: 170, maxAC: 6.6, maxDC: 80, wltpKm: 305, dcChargeMin: 35, dcChargeRange: "20-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 150.000 km", cd: 0.32 },
+  { name: "Seres 5", batteryKWh: 80, effWh: 180, maxAC: 11, maxDC: 150, wltpKm: 445, dcChargeMin: 30, dcChargeRange: "10-80%", heatPump: true, batteryType: "NMC", warranty: "8 yil / 150.000 km", cd: 0.29 },
+  // SsangYong
+  { name: "SsangYong Torres EVX", batteryKWh: 73.4, effWh: 181, maxAC: 11, maxDC: 120, wltpKm: 405, dcChargeMin: 33, dcChargeRange: "10-80%", heatPump: true, batteryType: "LFP", warranty: "8 yil / 160.000 km", cd: 0.34 },
   // Diger
-  { name: "Diger (50 kWh)", batteryKWh: 50, effWh: 160, maxAC: 11, maxDC: 100, wltpKm: 310, dcChargeMin: 35, dcChargeRange: "10-80%" },
-  { name: "Diger (75 kWh)", batteryKWh: 75, effWh: 170, maxAC: 11, maxDC: 150, wltpKm: 440, dcChargeMin: 35, dcChargeRange: "10-80%" },
-  { name: "Diger (100 kWh)", batteryKWh: 100, effWh: 190, maxAC: 11, maxDC: 200, wltpKm: 525, dcChargeMin: 35, dcChargeRange: "10-80%" },
+  { name: "Diger (50 kWh)", batteryKWh: 50, effWh: 160, maxAC: 11, maxDC: 100, wltpKm: 310, dcChargeMin: 35, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.3 },
+  { name: "Diger (75 kWh)", batteryKWh: 75, effWh: 170, maxAC: 11, maxDC: 150, wltpKm: 440, dcChargeMin: 35, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.3 },
+  { name: "Diger (100 kWh)", batteryKWh: 100, effWh: 190, maxAC: 11, maxDC: 200, wltpKm: 525, dcChargeMin: 35, dcChargeRange: "10-80%", heatPump: false, batteryType: "NMC", warranty: "8 yil / 160.000 km", cd: 0.3 },
 ].sort((a, b) => a.name.localeCompare(b.name, "tr"));
 
 export default function HesaplaPage() {
@@ -329,15 +336,23 @@ export default function HesaplaPage() {
         </div>
 
         {/* Vehicle info */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-2.5 rounded-lg bg-background/50 text-xs text-muted-foreground">
-          <div><span className="font-semibold text-foreground">{vehicle.batteryKWh}</span> kWh</div>
-          <div><span className="font-semibold text-foreground">{vehicle.wltpKm}</span> km WLTP</div>
-          <div><span className="font-semibold text-foreground">{(vehicle.effWh / 10).toFixed(1)}</span> kWh/100km</div>
-          <div>AC <span className="font-semibold text-foreground">{vehicle.maxAC}</span> kW</div>
-          <div>DC <span className="font-semibold text-foreground">{vehicle.maxDC}</span> kW</div>
-          {vehicle.dcChargeMin && (
-            <div><span className="font-semibold text-primary">{vehicle.dcChargeMin} dk</span> {vehicle.dcChargeRange} DC</div>
-          )}
+        <div className="rounded-lg bg-background/50 px-3 py-2.5 text-xs text-muted-foreground space-y-1.5">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <div><span className="font-semibold text-foreground">{vehicle.batteryKWh}</span> kWh</div>
+            <div><span className="font-semibold text-foreground">{vehicle.wltpKm}</span> km WLTP</div>
+            <div><span className="font-semibold text-foreground">{(vehicle.effWh / 10).toFixed(1)}</span> kWh/100km</div>
+            <div>AC <span className="font-semibold text-foreground">{vehicle.maxAC}</span> kW</div>
+            <div>DC <span className="font-semibold text-foreground">{vehicle.maxDC}</span> kW</div>
+            {vehicle.dcChargeMin && (
+              <div><span className="font-semibold text-primary">{vehicle.dcChargeMin} dk</span> {vehicle.dcChargeRange} DC</div>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border/30 pt-1.5">
+            <div>Isi Pompasi: <span className={`font-semibold ${vehicle.heatPump ? "text-emerald-400" : "text-muted-foreground/60"}`}>{vehicle.heatPump ? "Var" : "Yok"}</span></div>
+            <div>Batarya: <span className="font-semibold text-foreground">{vehicle.batteryType}</span></div>
+            <div>Garanti: <span className="font-semibold text-foreground">{vehicle.warranty}</span></div>
+            <div>Cd: <span className="font-semibold text-foreground">{vehicle.cd}</span></div>
+          </div>
         </div>
 
         {/* Charge type */}
