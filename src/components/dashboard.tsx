@@ -181,7 +181,7 @@ export function Dashboard({
           <div className="flex items-center gap-1.5">
             <button onClick={() => setVerifiedOnly(!verifiedOnly)}
               className={`px-2 py-1 rounded-lg text-[10px] font-medium transition-all shrink-0 ${verifiedOnly ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-card border border-border/60 text-muted-foreground"}`}
-            >Dogrulanmis</button>
+            >Sadece Dogrulanmis Fiyatlar</button>
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)}
               className="h-7 px-1.5 rounded-lg bg-card border border-border/60 text-[10px] font-medium text-foreground focus:outline-none cursor-pointer flex-1 min-w-0"
             >{SORT_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}</select>
