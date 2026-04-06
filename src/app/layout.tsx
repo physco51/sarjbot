@@ -1,24 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Outfit, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const outfit = Outfit({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmSans = DM_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "ŞarjBot - Türkiye EV Şarj Fiyatları",
+  title: "SarjBot — Turkiye EV Sarj Fiyat Karsilastirma",
   description:
-    "Türkiye'deki tüm elektrikli araç şarj istasyonlarının güncel fiyatlarını karşılaştırın. ZES, Trugo, Eşarj, Voltrun ve daha fazlası.",
-  keywords: "elektrikli araç, şarj istasyonu, fiyat karşılaştırma, ZES, Trugo, Eşarj, Türkiye",
+    "Turkiye'deki tum elektrikli arac sarj istasyonlarinin guncel fiyatlarini karsilastirin. ZES, Trugo, Esarj, Voltrun ve daha fazlasi.",
+  keywords:
+    "elektrikli arac, sarj istasyonu, fiyat karsilastirma, ZES, Trugo, Esarj, Turkiye, kWh fiyat",
 };
 
 export default function RootLayout({
@@ -29,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${outfit.variable} ${dmSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <Header />

@@ -1,0 +1,185 @@
+{
+  "stations": [
+    {
+      "id": "zes-kadikoy-001",
+      "name": "ZES Kadıköy Feneryolu",
+      "operator": "ZES",
+      "location": { "lat": 40.9882, "lng": 29.0364, "city": "İstanbul", "district": "Kadıköy", "address": "Feneryolu Mah. Bağdat Cad. No:123" },
+      "connectors": [
+        { "id": "c1", "type": "CCS2", "powerKW": 150, "status": "available" },
+        { "id": "c2", "type": "CCS2", "powerKW": 150, "status": "occupied" },
+        { "id": "c3", "type": "Type2", "powerKW": 22, "status": "available" },
+        { "id": "c4", "type": "Type2", "powerKW": 22, "status": "available" }
+      ],
+      "pricing": { "pricePerKWh": 7.50, "currency": "TRY", "sessionFee": 0, "parkingFeePerMin": 0, "idleFeePerMin": 0.50, "memberDiscount": 10 },
+      "amenities": ["WiFi", "WC", "Kafe", "Üstü Kapalı"],
+      "rating": 4.3,
+      "reviewCount": 128,
+      "availability": { "totalSlots": 4, "availableSlots": 3, "waitTime": 0 },
+      "operatingHours": "7/24",
+      "images": [],
+      "lastUpdated": "2026-04-06T10:30:00Z"
+    },
+    {
+      "id": "esarj-uskudar-001",
+      "name": "Eşarj Üsküdar Merkez",
+      "operator": "Eşarj",
+      "location": { "lat": 41.0252, "lng": 29.0159, "city": "İstanbul", "district": "Üsküdar", "address": "Altunizade Mah. Kısıklı Cad. No:45" },
+      "connectors": [
+        { "id": "c1", "type": "CCS2", "powerKW": 60, "status": "available" },
+        { "id": "c2", "type": "Type2", "powerKW": 22, "status": "occupied" }
+      ],
+      "pricing": { "pricePerKWh": 6.80, "currency": "TRY", "sessionFee": 2.00, "parkingFeePerMin": 0, "idleFeePerMin": 0, "memberDiscount": 15 },
+      "amenities": ["WiFi", "WC"],
+      "rating": 4.1,
+      "reviewCount": 87,
+      "availability": { "totalSlots": 2, "availableSlots": 1, "waitTime": 0 },
+      "operatingHours": "06:00-23:00",
+      "images": [],
+      "lastUpdated": "2026-04-06T09:15:00Z"
+    },
+    {
+      "id": "sharz-besiktas-001",
+      "name": "Sharz.net Beşiktaş",
+      "operator": "Sharz",
+      "location": { "lat": 41.0440, "lng": 29.0010, "city": "İstanbul", "district": "Beşiktaş", "address": "Sinanpaşa Mah. Ortabahçe Cad. No:78" },
+      "connectors": [
+        { "id": "c1", "type": "CCS2", "powerKW": 120, "status": "occupied" },
+        { "id": "c2", "type": "CHAdeMO", "powerKW": 50, "status": "available" },
+        { "id": "c3", "type": "Type2", "powerKW": 22, "status": "out_of_service" }
+      ],
+      "pricing": { "pricePerKWh": 9.00, "currency": "TRY", "sessionFee": 0, "parkingFeePerMin": 0.30, "idleFeePerMin": 0.75, "memberDiscount": 5 },
+      "amenities": ["WC", "Kafe", "AVM"],
+      "rating": 3.8,
+      "reviewCount": 56,
+      "availability": { "totalSlots": 3, "availableSlots": 1, "waitTime": 15 },
+      "operatingHours": "7/24",
+      "images": [],
+      "lastUpdated": "2026-04-06T11:00:00Z"
+    },
+    {
+      "id": "trugo-atasehir-001",
+      "name": "Trugo Ataşehir",
+      "operator": "Trugo",
+      "location": { "lat": 40.9923, "lng": 29.1120, "city": "İstanbul", "district": "Ataşehir", "address": "Atatürk Mah. Ataşehir Blv. No:56" },
+      "connectors": [
+        { "id": "c1", "type": "CCS2", "powerKW": 180, "status": "available" },
+        { "id": "c2", "type": "CCS2", "powerKW": 180, "status": "available" },
+        { "id": "c3", "type": "Type2", "powerKW": 22, "status": "available" },
+        { "id": "c4", "type": "Type2", "powerKW": 22, "status": "available" },
+        { "id": "c5", "type": "CHAdeMO", "powerKW": 50, "status": "occupied" },
+        { "id": "c6", "type": "AC", "powerKW": 7, "status": "available" }
+      ],
+      "pricing": { "pricePerKWh": 7.20, "currency": "TRY", "sessionFee": 0, "parkingFeePerMin": 0, "idleFeePerMin": 0.40, "memberDiscount": 12 },
+      "amenities": ["WiFi", "WC", "Kafe", "Restaurant", "AVM", "Üstü Kapalı", "Engelli Erişimi"],
+      "rating": 4.6,
+      "reviewCount": 234,
+      "availability": { "totalSlots": 6, "availableSlots": 5, "waitTime": 0 },
+      "operatingHours": "7/24",
+      "images": [],
+      "lastUpdated": "2026-04-06T10:45:00Z"
+    },
+    {
+      "id": "tesla-maltepe-001",
+      "name": "Tesla Supercharger Maltepe",
+      "operator": "Tesla",
+      "location": { "lat": 40.9340, "lng": 29.1310, "city": "İstanbul", "district": "Maltepe", "address": "Cevizli Mah. Tugay Yolu Cad. No:200" },
+      "connectors": [
+        { "id": "c1", "type": "Tesla_NACS", "powerKW": 250, "status": "available" },
+        { "id": "c2", "type": "Tesla_NACS", "powerKW": 250, "status": "available" },
+        { "id": "c3", "type": "Tesla_NACS", "powerKW": 250, "status": "occupied" },
+        { "id": "c4", "type": "Tesla_NACS", "powerKW": 250, "status": "available" },
+        { "id": "c5", "type": "CCS2", "powerKW": 250, "status": "available" },
+        { "id": "c6", "type": "CCS2", "powerKW": 250, "status": "available" },
+        { "id": "c7", "type": "CCS2", "powerKW": 250, "status": "occupied" },
+        { "id": "c8", "type": "CCS2", "powerKW": 250, "status": "available" }
+      ],
+      "pricing": { "pricePerKWh": 8.50, "currency": "TRY", "sessionFee": 0, "parkingFeePerMin": 0, "idleFeePerMin": 1.00, "memberDiscount": 0 },
+      "amenities": ["Üstü Kapalı"],
+      "rating": 4.7,
+      "reviewCount": 312,
+      "availability": { "totalSlots": 8, "availableSlots": 6, "waitTime": 0 },
+      "operatingHours": "7/24",
+      "images": [],
+      "lastUpdated": "2026-04-06T11:15:00Z"
+    },
+    {
+      "id": "voltrun-sisli-001",
+      "name": "Voltrun Şişli",
+      "operator": "Voltrun",
+      "location": { "lat": 41.0602, "lng": 28.9877, "city": "İstanbul", "district": "Şişli", "address": "Mecidiyeköy Mah. Büyükdere Cad. No:88" },
+      "connectors": [
+        { "id": "c1", "type": "CCS2", "powerKW": 60, "status": "available" },
+        { "id": "c2", "type": "Type2", "powerKW": 22, "status": "available" }
+      ],
+      "pricing": { "pricePerKWh": 7.80, "currency": "TRY", "sessionFee": 1.50, "parkingFeePerMin": 0.20, "idleFeePerMin": 0.50, "memberDiscount": 8 },
+      "amenities": ["WiFi", "WC", "AVM"],
+      "rating": 3.9,
+      "reviewCount": 43,
+      "availability": { "totalSlots": 2, "availableSlots": 2, "waitTime": 0 },
+      "operatingHours": "08:00-22:00",
+      "images": [],
+      "lastUpdated": "2026-04-06T08:30:00Z"
+    },
+    {
+      "id": "aksapower-bakirkoy-001",
+      "name": "Aksapower Bakırköy",
+      "operator": "Aksapower",
+      "location": { "lat": 40.9800, "lng": 28.8770, "city": "İstanbul", "district": "Bakırköy", "address": "Zuhuratbaba Mah. İncirli Cad. No:34" },
+      "connectors": [
+        { "id": "c1", "type": "CCS2", "powerKW": 100, "status": "available" },
+        { "id": "c2", "type": "CCS2", "powerKW": 100, "status": "available" },
+        { "id": "c3", "type": "Type2", "powerKW": 22, "status": "available" },
+        { "id": "c4", "type": "AC", "powerKW": 7, "status": "available" }
+      ],
+      "pricing": { "pricePerKWh": 6.50, "currency": "TRY", "sessionFee": 0, "parkingFeePerMin": 0, "idleFeePerMin": 0, "memberDiscount": 20 },
+      "amenities": ["WiFi", "WC", "Kafe", "Engelli Erişimi"],
+      "rating": 4.4,
+      "reviewCount": 95,
+      "availability": { "totalSlots": 4, "availableSlots": 4, "waitTime": 0 },
+      "operatingHours": "7/24",
+      "images": [],
+      "lastUpdated": "2026-04-06T10:00:00Z"
+    },
+    {
+      "id": "zes-ankara-001",
+      "name": "ZES Ankara Çankaya",
+      "operator": "ZES",
+      "location": { "lat": 39.9208, "lng": 32.8541, "city": "Ankara", "district": "Çankaya", "address": "Kavaklıdere Mah. Atatürk Blv. No:150" },
+      "connectors": [
+        { "id": "c1", "type": "CCS2", "powerKW": 150, "status": "available" },
+        { "id": "c2", "type": "CCS2", "powerKW": 150, "status": "available" },
+        { "id": "c3", "type": "Type2", "powerKW": 22, "status": "occupied" }
+      ],
+      "pricing": { "pricePerKWh": 7.00, "currency": "TRY", "sessionFee": 0, "parkingFeePerMin": 0, "idleFeePerMin": 0.50, "memberDiscount": 10 },
+      "amenities": ["WiFi", "WC", "Üstü Kapalı"],
+      "rating": 4.2,
+      "reviewCount": 76,
+      "availability": { "totalSlots": 3, "availableSlots": 2, "waitTime": 0 },
+      "operatingHours": "7/24",
+      "images": [],
+      "lastUpdated": "2026-04-06T09:00:00Z"
+    }
+  ],
+  "vehicles": [
+    { "id": "tesla-model3-lr", "brand": "Tesla", "model": "Model 3 Long Range", "batteryKWh": 75, "maxACkW": 11, "maxDCkW": 250, "efficiencyWhPerKm": 152, "connectors": ["CCS2", "Tesla_NACS"] },
+    { "id": "tesla-modely-lr", "brand": "Tesla", "model": "Model Y Long Range", "batteryKWh": 75, "maxACkW": 11, "maxDCkW": 250, "efficiencyWhPerKm": 166, "connectors": ["CCS2", "Tesla_NACS"] },
+    { "id": "togg-t10x", "brand": "TOGG", "model": "T10X", "batteryKWh": 88.5, "maxACkW": 11, "maxDCkW": 150, "efficiencyWhPerKm": 190, "connectors": ["CCS2", "Type2"] },
+    { "id": "bmw-ix3", "brand": "BMW", "model": "iX3", "batteryKWh": 80, "maxACkW": 11, "maxDCkW": 150, "efficiencyWhPerKm": 186, "connectors": ["CCS2", "Type2"] },
+    { "id": "hyundai-ioniq5", "brand": "Hyundai", "model": "IONIQ 5", "batteryKWh": 77.4, "maxACkW": 11, "maxDCkW": 240, "efficiencyWhPerKm": 175, "connectors": ["CCS2", "Type2"] },
+    { "id": "vw-id4", "brand": "Volkswagen", "model": "ID.4", "batteryKWh": 77, "maxACkW": 11, "maxDCkW": 135, "efficiencyWhPerKm": 181, "connectors": ["CCS2", "Type2"] },
+    { "id": "mg4-ev", "brand": "MG", "model": "MG4 Electric", "batteryKWh": 64, "maxACkW": 11, "maxDCkW": 135, "efficiencyWhPerKm": 163, "connectors": ["CCS2", "Type2"] },
+    { "id": "byd-atto3", "brand": "BYD", "model": "Atto 3", "batteryKWh": 60.5, "maxACkW": 7, "maxDCkW": 88, "efficiencyWhPerKm": 175, "connectors": ["CCS2", "Type2"] },
+    { "id": "kia-ev6", "brand": "Kia", "model": "EV6", "batteryKWh": 77.4, "maxACkW": 11, "maxDCkW": 240, "efficiencyWhPerKm": 169, "connectors": ["CCS2", "Type2"] },
+    { "id": "mercedes-eqb", "brand": "Mercedes", "model": "EQB 250+", "batteryKWh": 70.5, "maxACkW": 11, "maxDCkW": 100, "efficiencyWhPerKm": 189, "connectors": ["CCS2", "Type2"] }
+  ],
+  "operators": [
+    { "id": "zes", "name": "ZES", "logo": "zes-logo.svg", "color": "#00B4D8", "website": "https://zes.net", "stationCount": 850 },
+    { "id": "esarj", "name": "Eşarj", "logo": "esarj-logo.svg", "color": "#FF6B35", "website": "https://esarj.com", "stationCount": 620 },
+    { "id": "sharz", "name": "Sharz.net", "logo": "sharz-logo.svg", "color": "#7C3AED", "website": "https://sharz.net", "stationCount": 480 },
+    { "id": "trugo", "name": "Trugo", "logo": "trugo-logo.svg", "color": "#10B981", "website": "https://trugo.com.tr", "stationCount": 350 },
+    { "id": "tesla", "name": "Tesla Supercharger", "logo": "tesla-logo.svg", "color": "#E31937", "website": "https://tesla.com", "stationCount": 120 },
+    { "id": "voltrun", "name": "Voltrun", "logo": "voltrun-logo.svg", "color": "#F59E0B", "website": "https://voltrun.com", "stationCount": 280 },
+    { "id": "aksapower", "name": "Aksapower", "logo": "aksapower-logo.svg", "color": "#3B82F6", "website": "https://aksapower.com", "stationCount": 150 }
+  ]
+}
