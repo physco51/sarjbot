@@ -205,14 +205,14 @@ export default function HesaplaPage() {
 
     fetch("/api/fiyatlar")
       .then((r) => r.json())
-      .then((ops: { name: string; prices: { AC: { min: number } | null; DC: { min: number } | null } }[]) => {
+      .then((ops: { name: string; prices: { AC: { min: number; isVerified: boolean } | null; DC: { min: number; isVerified: boolean } | null } }[]) => {
         let bestAC: { price: number; name: string } | null = null;
         let bestDC: { price: number; name: string } | null = null;
         for (const op of ops) {
-          if (op.prices.AC && (!bestAC || op.prices.AC.min < bestAC.price)) {
+          if (op.prices.AC?.isVerified && (!bestAC || op.prices.AC.min < bestAC.price)) {
             bestAC = { price: op.prices.AC.min, name: op.name };
           }
-          if (op.prices.DC && (!bestDC || op.prices.DC.min < bestDC.price)) {
+          if (op.prices.DC?.isVerified && (!bestDC || op.prices.DC.min < bestDC.price)) {
             bestDC = { price: op.prices.DC.min, name: op.name };
           }
         }
