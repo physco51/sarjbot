@@ -59,17 +59,25 @@ function getSortFn(key: SortKey) {
 export function Dashboard({
   withPrices,
   withoutPrices,
-  totalCount,
 }: {
   withPrices: OperatorWithPrices[];
   withoutPrices: OperatorWithPrices[];
-  totalCount: number;
 }) {
   const [sortBy, setSortBy] = useState<SortKey>("price_asc");
   const [chargeFilter, setChargeFilter] = useState<ChargeFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [gridVisibleCount, setGridVisibleCount] = useState(6);
+  const [showNoPrices, setShowNoPrices] = useState(false);
+
+  // Reset grid count when filters change
+  const filterKey = `${searchQuery}-${chargeFilter}-${verifiedOnly}-${sortBy}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setGridVisibleCount(6);
+  }
 
   const filtered = useMemo(() => {
     let result = [...withPrices];
@@ -222,15 +230,30 @@ export function Dashboard({
           <p className="text-sm text-muted-foreground/60 mt-1">Filtrelerinizi genisletin</p>
         </div>
       ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((op, i) => (
-            <OperatorCard key={op.id} op={op} index={i} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.slice(0, gridVisibleCount).map((op, i) => (
+              <OperatorCard key={op.id} op={op} index={i} />
+            ))}
+          </div>
+          {gridVisibleCount < filtered.length && (
+            <div className="text-center pt-2">
+              <button
+                onClick={() => setGridVisibleCount((c) => c + 6)}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-white/[0.03] transition-all"
+              >
+                Daha fazla goster
+                <span className="text-xs text-muted-foreground/50">
+                  ({gridVisibleCount}/{filtered.length})
+                </span>
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="rounded-xl border border-border/60 overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-card/80 sticky top-[108px] z-30">
+            <thead className="bg-card/80">
               <tr className="border-b border-border/40">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground">#</th>
                 <SortableTh label="Operator" sortKey="name_asc" currentSort={sortBy} onSort={setSortBy} align="left" />
@@ -299,22 +322,28 @@ export function Dashboard({
       {/* Operators without prices */}
       {withoutPrices.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold mb-3 text-muted-foreground">
+          <button
+            onClick={() => setShowNoPrices(!showNoPrices)}
+            className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors mb-3"
+          >
+            <span className={`transition-transform ${showNoPrices ? "rotate-90" : ""}`}>{"\u25B6"}</span>
             Fiyat Bilgisi Henuz Mevcut Degil ({withoutPrices.length})
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-            {withoutPrices.map((op, i) => (
-              <a
-                key={op.id}
-                href={`/operatorler/${op.slug}`}
-                className="rounded-lg border border-border/40 p-2.5 hover:bg-white/[0.02] hover:border-primary/20 transition-all text-xs"
-              >
-                <div className="font-medium truncate text-muted-foreground">
-                  <span className="text-muted-foreground/40 font-mono">{i + 1}.</span> {op.name}
-                </div>
-              </a>
-            ))}
-          </div>
+          </button>
+          {showNoPrices && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+              {withoutPrices.map((op, i) => (
+                <a
+                  key={op.id}
+                  href={`/operatorler/${op.slug}`}
+                  className="rounded-lg border border-border/40 p-2.5 hover:bg-white/[0.02] hover:border-primary/20 transition-all text-xs"
+                >
+                  <div className="font-medium truncate text-muted-foreground">
+                    <span className="text-muted-foreground/40 font-mono">{i + 1}.</span> {op.name}
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
         </section>
       )}
     </div>

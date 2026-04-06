@@ -75,7 +75,6 @@ export default async function Home() {
       <Dashboard
         withPrices={withPrices}
         withoutPrices={withoutPrices}
-        totalCount={data.length}
       />
     </div>
   );
