@@ -85,9 +85,9 @@ export default async function OperatorPage({
           {(["AC", "DC", "HPC"] as const).map((type) => {
             const price = operator.prices[type];
             const config = {
-              AC: { title: "AC Sarj", desc: "22 kW - Yavas sarj", icon: "&#9889;", border: "border-emerald-500/30", bg: "bg-emerald-500/5" },
-              DC: { title: "DC Hizli", desc: "180 kW'a kadar", icon: "&#9889;&#9889;", border: "border-sky-500/30", bg: "bg-sky-500/5" },
-              HPC: { title: "HPC Ultra Hizli", desc: "180 kW uzeri", icon: "&#9889;&#9889;&#9889;", border: "border-violet-500/30", bg: "bg-violet-500/5" },
+              AC: { title: "AC Sarj", desc: "22 kW - Yavas sarj", icon: "\u26A1", border: "border-emerald-500/30", bg: "bg-emerald-500/5" },
+              DC: { title: "DC Hizli", desc: "180 kW'a kadar", icon: "\u26A1\u26A1", border: "border-sky-500/30", bg: "bg-sky-500/5" },
+              HPC: { title: "HPC Ultra Hizli", desc: "180 kW uzeri", icon: "\u26A1\u26A1\u26A1", border: "border-violet-500/30", bg: "bg-violet-500/5" },
             }[type];
 
             return (

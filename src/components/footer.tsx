@@ -4,7 +4,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <span className="text-primary">&#9889;</span>
+            <span className="text-primary">{"\u26A1"}</span>
             <span className="font-semibold text-foreground">SarjBot</span>
             <span className="text-muted-foreground/60">|</span>
             <span>Turkiye EV Sarj Fiyat Karsilastirma</span>

@@ -50,7 +50,7 @@ export default async function Home() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <StatCard label="Toplam Operator" value={data.length.toString()} icon="&#9889;" />
+        <StatCard label="Toplam Operator" value={data.length.toString()} icon={"\u26A1"} />
         <StatCard
           label="En Ucuz AC"
           value={cheapestAC ? `${cheapestAC.prices.AC!.min.toFixed(2)} TL` : "-"}

@@ -7,7 +7,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <span className="text-lg">&#9889;</span>
+              <span className="text-lg">{"\u26A1"}</span>
             </div>
             <div>
               <span className="text-lg font-bold tracking-tight text-foreground">

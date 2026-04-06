@@ -97,7 +97,7 @@ export default function HesaplaPage() {
                     : "bg-background border border-border/60 text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {t === "AC" ? "&#9889; AC (22 kW)" : `&#9889;&#9889; DC (${vehicle.maxDC} kW)`}
+                {t === "AC" ? "\u26A1 AC (22 kW)" : `\u26A1\u26A1 DC (${vehicle.maxDC} kW)`}
               </button>
             ))}
           </div>

@@ -96,7 +96,7 @@ export function OperatorCard({
             key={type}
             className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20"
           >
-            {type === "AC" ? "&#9889; AC" : type === "DC" ? "&#9889;&#9889; DC" : "&#9889;&#9889;&#9889; HPC"}
+            {type === "AC" ? "\u26A1 AC" : type === "DC" ? "\u26A1\u26A1 DC" : "\u26A1\u26A1\u26A1 HPC"}
           </span>
         ))}
         {op.websiteUrl && (
