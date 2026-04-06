@@ -1,5 +1,6 @@
 import { getAllOperatorsWithPrices } from "@/lib/db/queries";
 import { Dashboard } from "@/components/dashboard";
+import { SonGuncelleme } from "@/components/son-guncelleme";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,12 @@ export default async function Home() {
     ? hpcOps.reduce((a, b) => (a.prices.HPC!.min < b.prices.HPC!.min ? a : b))
     : null;
 
+  const lastUpdated = withPrices.reduce<Date | null>((latest, op) => {
+    if (!op.lastUpdated) return latest;
+    if (!latest) return op.lastUpdated;
+    return op.lastUpdated > latest ? op.lastUpdated : latest;
+  }, null);
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       {/* Hero */}
@@ -38,6 +45,7 @@ export default async function Home() {
           {data.length} operatorun guncel fiyatlarini tek bir yerde karsilastirin.
           <span className="text-foreground font-medium"> {withPrices.length}</span> operatorun fiyati mevcut.
         </p>
+        <SonGuncelleme lastUpdated={lastUpdated} />
       </div>
 
       {/* Stats */}
