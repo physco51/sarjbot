@@ -1,65 +1,134 @@
-import Image from "next/image";
+import { getAllOperatorsWithPrices } from "@/lib/db/queries";
+import { FiyatTablosu } from "@/components/fiyat-tablosu";
+import { SonGuncelleme } from "@/components/son-guncelleme";
+import { KarsilastirmaGrafik } from "@/components/karsilastirma-grafik";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const data = await getAllOperatorsWithPrices();
+
+  // Fiyati olan ve olmayan operatorleri ayir
+  const withPrices = data.filter(
+    (op) => op.prices.AC || op.prices.DC || op.prices.HPC
+  );
+  const withoutPrices = data.filter(
+    (op) => !op.prices.AC && !op.prices.DC && !op.prices.HPC
+  );
+
+  const lastUpdated = withPrices.reduce<Date | null>((latest, op) => {
+    if (!op.lastUpdated) return latest;
+    if (!latest) return op.lastUpdated;
+    return op.lastUpdated > latest ? op.lastUpdated : latest;
+  }, null);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      {/* Hero */}
+      <div className="mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+          Turkiye EV Sarj Fiyatlari
+        </h1>
+        <p className="text-muted-foreground mb-4">
+          {data.length} operatorun guncel fiyatlarini tek bir yerde karsilastirin.
+          {withPrices.length} operatorun fiyati mevcut.
+        </p>
+        <SonGuncelleme lastUpdated={lastUpdated} />
+      </div>
+
+      {/* Stats */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <StatCard
+          label="Toplam Operator"
+          value={data.length.toString()}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+        <StatCard
+          label="En Ucuz AC"
+          value={(() => {
+            const acOps = withPrices.filter((d) => d.prices.AC);
+            if (!acOps.length) return "-";
+            const cheapest = acOps.reduce((a, b) =>
+              a.prices.AC!.min < b.prices.AC!.min ? a : b
+            );
+            return `${cheapest.prices.AC!.min.toFixed(2)} TL - ${cheapest.name}`;
+          })()}
+        />
+        <StatCard
+          label="En Ucuz DC"
+          value={(() => {
+            const dcOps = withPrices.filter((d) => d.prices.DC);
+            if (!dcOps.length) return "-";
+            const cheapest = dcOps.reduce((a, b) =>
+              a.prices.DC!.min < b.prices.DC!.min ? a : b
+            );
+            return `${cheapest.prices.DC!.min.toFixed(2)} TL - ${cheapest.name}`;
+          })()}
+        />
+        <StatCard
+          label="En Ucuz HPC"
+          value={(() => {
+            const hpcOps = withPrices.filter((d) => d.prices.HPC);
+            if (!hpcOps.length) return "-";
+            const cheapest = hpcOps.reduce((a, b) =>
+              a.prices.HPC!.min < b.prices.HPC!.min ? a : b
+            );
+            return `${cheapest.prices.HPC!.min.toFixed(2)} TL - ${cheapest.name}`;
+          })()}
+        />
+      </section>
+
+      {/* Price Table - Only operators with prices */}
+      <section className="mb-12">
+        <h2 className="text-xl font-semibold mb-4">
+          Fiyat Tablosu ({withPrices.length} operator)
+        </h2>
+        <FiyatTablosu data={withPrices} />
+      </section>
+
+      {/* Chart */}
+      <section className="mb-12">
+        <h2 className="text-xl font-semibold mb-4">Fiyat Karsilastirmasi</h2>
+        <div className="rounded-lg border p-4 bg-card">
+          <KarsilastirmaGrafik data={withPrices} />
+        </div>
+      </section>
+
+      {/* Operators without prices */}
+      {withoutPrices.length > 0 && (
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold mb-4">
+            Fiyat Bilgisi Henuz Mevcut Degil ({withoutPrices.length} operator)
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Bu operatorlerin fiyatlari henuz resmi sitelerinden cekilemedi.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {withoutPrices.map((op, i) => (
+              <a
+                key={op.id}
+                href={`/operatorler/${op.slug}`}
+                className="rounded-lg border p-3 hover:bg-muted/30 transition-colors text-sm"
+              >
+                <div className="min-w-0">
+                  <div className="font-medium truncate">
+                    <span className="text-muted-foreground">{i + 1}.</span> {op.name}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">{op.description}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border p-4 bg-card">
+      <div className="text-sm text-muted-foreground">{label}</div>
+      <div className="text-lg font-semibold mt-1">{value}</div>
     </div>
   );
 }
