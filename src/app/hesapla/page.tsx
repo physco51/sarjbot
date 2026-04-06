@@ -475,7 +475,7 @@ export default function HesaplaPage() {
               <ResultItem label="TL/km (elektrik)" value={`${result.costPerKm.toFixed(2)} TL`} />
               <ResultItem label={`TL/km (${fuelType})`} value={`${result.gasCostPerKm.toFixed(2)} TL`} />
               <ResultItem
-                label={`${fuelType === "benzin" ? "Benzinli" : "Dizel"} Esdeger`}
+                label={`${fuelType === "benzin" ? "Benzin" : "Mazot"} Maliyeti`}
                 value={`${result.gasCost.toFixed(2)} TL`}
                 sub={`${gasLPer100km}L/100km, ${gasPricePerL.toFixed(2)} TL/L`}
               />
@@ -487,14 +487,14 @@ export default function HesaplaPage() {
               <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-4 text-center">
                 <div className="text-2xl font-extrabold text-emerald-400">%{result.savingsPercent} tasarruf!</div>
                 <div className="text-xs text-emerald-400/70 mt-1">
-                  {fuelType === "benzin" ? "Benzinli" : "Dizel"} araca gore {(result.gasCost - result.totalCost).toFixed(2)} TL daha ucuz
+                  ~{result.rangeKm} km menzil icin {fuelType === "benzin" ? "benzinli" : "dizel"} araca gore {(result.gasCost - result.totalCost).toFixed(2)} TL daha ucuz
                 </div>
               </div>
             ) : (
               <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-4 text-center">
                 <div className="text-lg font-extrabold text-amber-400">Elektrik daha pahali</div>
                 <div className="text-xs text-amber-400/70 mt-1">
-                  Bu fiyatla {fuelType === "benzin" ? "benzinli" : "dizel"} arac {(result.totalCost - result.gasCost).toFixed(2)} TL daha ucuz
+                  ~{result.rangeKm} km menzil icin {fuelType === "benzin" ? "benzinli" : "dizel"} arac {(result.totalCost - result.gasCost).toFixed(2)} TL daha ucuz
                 </div>
               </div>
             )}

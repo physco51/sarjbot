@@ -116,7 +116,7 @@ export default function KarsilastirPage() {
                 : "bg-background border border-border/40 text-muted-foreground hover:text-foreground"
             }`}
           >
-            {"\u2713"} Dogrulanmis
+            Sadece Dogrulanmis Fiyatlar
           </button>
         </div>
 
