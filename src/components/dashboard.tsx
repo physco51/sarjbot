@@ -125,79 +125,74 @@ export function Dashboard({
     <div className="space-y-6">
       {/* Filter Bar */}
       <div className="sticky top-16 z-40 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 bg-[#0B1120]/90 backdrop-blur-md border-b border-border/30">
-        {/* Row 1: Search + Charge type chips */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 min-w-0">
+        {/* Desktop: single row | Mobile: two rows */}
+        <div className="hidden sm:flex items-center gap-2">
+          <div className="relative flex-1 max-w-xs">
             <input
               type="text"
-              placeholder="Ara..."
+              placeholder="Operator ara..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-8 px-3 pl-8 rounded-lg bg-card border border-border/60 text-xs placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="w-full h-9 px-3 pl-9 rounded-lg bg-card border border-border/60 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
-            <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-1.5">
             {(["all", "AC", "DC", "HPC"] as ChargeFilter[]).map((f) => (
-              <button
-                key={f}
-                onClick={() => handleChargeFilter(f)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
-                  chargeFilter === f
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                    : "bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/30"
-                }`}
-              >
-                {f === "all" ? "Tumu" : f}
-              </button>
+              <button key={f} onClick={() => handleChargeFilter(f)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${chargeFilter === f ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" : "bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/30"}`}
+              >{f === "all" ? "Tumu" : f}</button>
             ))}
+          </div>
+          <button onClick={() => setVerifiedOnly(!verifiedOnly)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${verifiedOnly ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-card border border-border/60 text-muted-foreground hover:text-foreground"}`}
+          >Sadece Dogrulanmis Fiyatlar</button>
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)}
+            className="h-9 px-3 rounded-lg bg-card border border-border/60 text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+          >{SORT_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}</select>
+          <div className="flex items-center gap-0.5 bg-card rounded-lg border border-border/60 p-0.5">
+            <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 012.5 1h3A1.5 1.5 0 017 2.5v3A1.5 1.5 0 015.5 7h-3A1.5 1.5 0 011 5.5v-3zm8 0A1.5 1.5 0 0110.5 1h3A1.5 1.5 0 0115 2.5v3A1.5 1.5 0 0113.5 7h-3A1.5 1.5 0 019 5.5v-3zm-8 8A1.5 1.5 0 012.5 9h3A1.5 1.5 0 017 10.5v3A1.5 1.5 0 015.5 15h-3A1.5 1.5 0 011 13.5v-3zm8 0A1.5 1.5 0 0110.5 9h3a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-1.5 1.5h-3A1.5 1.5 0 019 13.5v-3z" /></svg>
+            </button>
+            <button onClick={() => setViewMode("list")} className={`p-1.5 rounded-md transition-colors ${viewMode === "list" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path fillRule="evenodd" d="M2.5 12a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" /></svg>
+            </button>
           </div>
         </div>
 
-        {/* Row 2: Verified + Sort + View toggle */}
-        <div className="flex items-center gap-2 mt-2">
-          <button
-            onClick={() => setVerifiedOnly(!verifiedOnly)}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all shrink-0 ${
-              verifiedOnly
-                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                : "bg-card border border-border/60 text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Sadece Dogrulanmis Fiyatlar
-          </button>
-
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as SortKey)}
-            className="h-8 px-2 rounded-lg bg-card border border-border/60 text-[11px] font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer flex-1 min-w-0"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
+        {/* Mobile: two compact rows */}
+        <div className="sm:hidden space-y-2">
+          <div className="flex items-center gap-1.5">
+            <div className="relative flex-1 min-w-0">
+              <input type="text" placeholder="Ara..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-8 px-3 pl-8 rounded-lg bg-card border border-border/60 text-xs placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50" />
+              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            {(["all", "AC", "DC", "HPC"] as ChargeFilter[]).map((f) => (
+              <button key={f} onClick={() => handleChargeFilter(f)}
+                className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition-all shrink-0 ${chargeFilter === f ? "bg-primary text-primary-foreground" : "bg-card border border-border/60 text-muted-foreground"}`}
+              >{f === "all" ? "Tumu" : f}</button>
             ))}
-          </select>
-
-          <div className="flex items-center gap-0.5 bg-card rounded-lg border border-border/60 p-0.5 shrink-0">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-1 rounded-md transition-colors ${viewMode === "grid" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M1 2.5A1.5 1.5 0 012.5 1h3A1.5 1.5 0 017 2.5v3A1.5 1.5 0 015.5 7h-3A1.5 1.5 0 011 5.5v-3zm8 0A1.5 1.5 0 0110.5 1h3A1.5 1.5 0 0115 2.5v3A1.5 1.5 0 0113.5 7h-3A1.5 1.5 0 019 5.5v-3zm-8 8A1.5 1.5 0 012.5 9h3A1.5 1.5 0 017 10.5v3A1.5 1.5 0 015.5 15h-3A1.5 1.5 0 011 13.5v-3zm8 0A1.5 1.5 0 0110.5 9h3a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-1.5 1.5h-3A1.5 1.5 0 019 13.5v-3z" />
-              </svg>
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`p-1 rounded-md transition-colors ${viewMode === "list" ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
-                <path fillRule="evenodd" d="M2.5 12a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" />
-              </svg>
-            </button>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => setVerifiedOnly(!verifiedOnly)}
+              className={`px-2 py-1 rounded-lg text-[10px] font-medium transition-all shrink-0 ${verifiedOnly ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-card border border-border/60 text-muted-foreground"}`}
+            >Dogrulanmis</button>
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)}
+              className="h-7 px-1.5 rounded-lg bg-card border border-border/60 text-[10px] font-medium text-foreground focus:outline-none cursor-pointer flex-1 min-w-0"
+            >{SORT_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}</select>
+            <div className="flex items-center gap-0.5 bg-card rounded-lg border border-border/60 p-0.5 shrink-0">
+              <button onClick={() => setViewMode("grid")} className={`p-1 rounded-md ${viewMode === "grid" ? "bg-primary/20 text-primary" : "text-muted-foreground"}`}>
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 012.5 1h3A1.5 1.5 0 017 2.5v3A1.5 1.5 0 015.5 7h-3A1.5 1.5 0 011 5.5v-3zm8 0A1.5 1.5 0 0110.5 1h3A1.5 1.5 0 0115 2.5v3A1.5 1.5 0 0113.5 7h-3A1.5 1.5 0 019 5.5v-3zm-8 8A1.5 1.5 0 012.5 9h3A1.5 1.5 0 017 10.5v3A1.5 1.5 0 015.5 15h-3A1.5 1.5 0 011 13.5v-3zm8 0A1.5 1.5 0 0110.5 9h3a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-1.5 1.5h-3A1.5 1.5 0 019 13.5v-3z" /></svg>
+              </button>
+              <button onClick={() => setViewMode("list")} className={`p-1 rounded-md ${viewMode === "list" ? "bg-primary/20 text-primary" : "text-muted-foreground"}`}>
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16"><path fillRule="evenodd" d="M2.5 12a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" /></svg>
+              </button>
+            </div>
           </div>
         </div>
 
