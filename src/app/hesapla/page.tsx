@@ -350,7 +350,7 @@ export default function HesaplaPage() {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border/30 pt-1.5">
             <div>Isi Pompasi: <span className={`font-semibold ${vehicle.heatPump ? "text-emerald-400" : "text-muted-foreground/60"}`}>{vehicle.heatPump ? "Var" : "Yok"}</span></div>
             <div>Batarya: <span className="font-semibold text-foreground">{vehicle.batteryType}</span></div>
-            <div>Garanti: <span className="font-semibold text-foreground">{vehicle.warranty}</span></div>
+            <div>Batarya Garantisi: <span className="font-semibold text-foreground">{vehicle.warranty}</span></div>
             <div>Cd: <span className="font-semibold text-foreground">{vehicle.cd}</span></div>
           </div>
         </div>
