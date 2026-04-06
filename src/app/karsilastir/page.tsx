@@ -15,12 +15,11 @@ function formatPrice(p: { min: number; max: number | null } | null): string {
   return p.min.toFixed(2);
 }
 
-function getBestIdx(values: (number | null)[], mode: "min" | "max"): number {
+function getBestIdx(values: (number | null)[]): number {
   let bestIdx = -1;
-  let bestVal = mode === "min" ? Infinity : -Infinity;
+  let bestVal = Infinity;
   values.forEach((v, i) => {
-    if (v == null) return;
-    if (mode === "min" ? v < bestVal : v > bestVal) {
+    if (v != null && v < bestVal) {
       bestVal = v;
       bestIdx = i;
     }
@@ -31,47 +30,36 @@ function getBestIdx(values: (number | null)[], mode: "min" | "max"): number {
 export default function KarsilastirPage() {
   const [allData, setAllData] = useState<OperatorWithPrices[]>([]);
   const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
-  const [search, setSearch] = useState("");
+  const [listFilter, setListFilter] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/fiyatlar")
       .then((r) => r.json())
       .then((data: OperatorWithPrices[]) => {
-        const withPrices = data.filter(
-          (d) => d.prices.AC || d.prices.DC || d.prices.HPC
-        );
-        setAllData(withPrices);
+        setAllData(data.filter((d) => d.prices.AC || d.prices.DC || d.prices.HPC));
         setLoading(false);
       });
   }, []);
 
-  const addOperator = (slug: string) => {
-    if (selectedSlugs.length >= 4 || selectedSlugs.includes(slug)) return;
-    setSelectedSlugs((prev) => [...prev, slug]);
-    setSearch("");
+  const toggle = (slug: string) => {
+    setSelectedSlugs((prev) => {
+      if (prev.includes(slug)) return prev.filter((s) => s !== slug);
+      if (prev.length >= 4) return prev;
+      return [...prev, slug];
+    });
   };
 
-  const removeOperator = (slug: string) => {
-    setSelectedSlugs((prev) => prev.filter((s) => s !== slug));
-  };
+  const filteredList = useMemo(() => {
+    if (!listFilter.trim()) return allData;
+    const q = listFilter.toLowerCase();
+    return allData.filter((d) => d.name.toLowerCase().includes(q));
+  }, [allData, listFilter]);
 
   const selectedData = useMemo(
     () => selectedSlugs.map((s) => allData.find((d) => d.slug === s)!).filter(Boolean),
     [selectedSlugs, allData]
   );
-
-  const searchResults = useMemo(() => {
-    if (!search.trim()) return [];
-    const q = search.toLowerCase();
-    return allData
-      .filter(
-        (d) =>
-          !selectedSlugs.includes(d.slug) &&
-          (d.name.toLowerCase().includes(q) || d.slug.includes(q))
-      )
-      .slice(0, 8);
-  }, [search, allData, selectedSlugs]);
 
   if (loading) {
     return (
@@ -84,7 +72,6 @@ export default function KarsilastirPage() {
     );
   }
 
-  // Comparison rows
   const rows: { label: string; key: "AC" | "DC" | "HPC"; desc: string }[] = [
     { label: "AC", key: "AC", desc: "22 kW" },
     { label: "DC", key: "DC", desc: "180 kW'a kadar" },
@@ -97,88 +84,99 @@ export default function KarsilastirPage() {
         Operator <span className="text-primary">Karsilastir</span>
       </h1>
       <p className="text-sm text-muted-foreground mb-6">
-        En fazla 4 operator secin, fiyatlarini yan yana karsilastirin.
+        Listeden en fazla 4 operator secin, fiyatlarini yan yana karsilastirin.
       </p>
 
-      {/* Search & Add */}
-      <div className="relative mb-6">
-        <div className="relative">
+      {/* Operator list with checkboxes */}
+      <div className="rounded-xl border border-border/60 bg-card mb-6">
+        {/* List filter */}
+        <div className="px-3 py-2 border-b border-border/40">
           <input
             type="text"
-            placeholder="Operator ara ve ekle..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-11 px-4 pl-10 rounded-xl bg-card border border-border/60 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+            placeholder="Filtrele..."
+            value={listFilter}
+            onChange={(e) => setListFilter(e.target.value)}
+            className="w-full h-8 px-2 rounded-md bg-background border border-border/40 text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/50"
           />
-          <svg
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50"
-            fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          {selectedSlugs.length >= 4 && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-amber-400">Maks 4</span>
-          )}
         </div>
 
-        {/* Dropdown results */}
-        {searchResults.length > 0 && (
-          <div className="absolute z-50 w-full mt-1 rounded-xl bg-card border border-border/60 shadow-xl overflow-hidden">
-            {searchResults.map((op) => (
+        {/* Scrollable list - 10 rows visible */}
+        <div className="max-h-[320px] overflow-y-auto">
+          {filteredList.map((op) => {
+            const isSelected = selectedSlugs.includes(op.slug);
+            const isDisabled = !isSelected && selectedSlugs.length >= 4;
+            const cheapest = [op.prices.AC?.min, op.prices.DC?.min, op.prices.HPC?.min]
+              .filter((p): p is number => p != null)
+              .sort((a, b) => a - b)[0];
+
+            return (
               <button
                 key={op.slug}
-                onClick={() => addOperator(op.slug)}
-                disabled={selectedSlugs.length >= 4}
-                className="w-full text-left px-4 py-2.5 text-sm hover:bg-white/[0.04] transition-colors flex items-center justify-between disabled:opacity-40"
+                onClick={() => toggle(op.slug)}
+                disabled={isDisabled}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left text-sm border-b border-border/20 last:border-0 transition-colors ${
+                  isSelected ? "bg-primary/5" : "hover:bg-white/[0.02]"
+                } ${isDisabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}`}
               >
-                <span className="font-medium">{op.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {op.prices.DC ? `DC ${op.prices.DC.min.toFixed(2)} TL` : op.prices.AC ? `AC ${op.prices.AC.min.toFixed(2)} TL` : ""}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+                {/* Checkbox */}
+                <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                  isSelected ? "bg-primary border-primary" : "border-border/60"
+                }`}>
+                  {isSelected && (
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
 
-      {/* Selected chips */}
-      {selectedSlugs.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-6">
-          {selectedData.map((op) => (
-            <span
-              key={op.slug}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/30 text-sm font-medium text-primary"
-            >
-              {op.name}
-              <button
-                onClick={() => removeOperator(op.slug)}
-                className="hover:text-foreground transition-colors text-primary/60"
-              >
-                {"\u2715"}
+                {/* Name */}
+                <span className={`flex-1 truncate ${isSelected ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
+                  {op.name}
+                </span>
+
+                {/* Quick prices */}
+                <div className="flex items-center gap-3 shrink-0 text-xs tabular-nums">
+                  {op.prices.AC && (
+                    <span className="text-muted-foreground/60">AC <span className={getPriceColor(op.prices.AC.min)}>{op.prices.AC.min.toFixed(2)}</span></span>
+                  )}
+                  {op.prices.DC && (
+                    <span className="text-muted-foreground/60">DC <span className={getPriceColor(op.prices.DC.min)}>{op.prices.DC.min.toFixed(2)}</span></span>
+                  )}
+                </div>
+
+                {/* Cheapest badge */}
+                {cheapest && (
+                  <span className={`text-[10px] font-bold tabular-nums shrink-0 ${getPriceColor(cheapest)}`}>
+                    {cheapest.toFixed(2)} TL
+                  </span>
+                )}
               </button>
-            </span>
-          ))}
-          {selectedSlugs.length < 4 && (
-            <span className="text-xs text-muted-foreground/50 self-center">
-              {4 - selectedSlugs.length} daha ekleyebilirsiniz
-            </span>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        <div className="px-3 py-2 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>{selectedSlugs.length}/4 secili</span>
+          {selectedSlugs.length > 0 && (
+            <button onClick={() => setSelectedSlugs([])} className="text-red-400 hover:text-red-300">
+              Temizle
+            </button>
           )}
         </div>
-      )}
+      </div>
 
-      {/* Comparison */}
-      {selectedData.length === 0 ? (
-        <div className="text-center py-20 rounded-xl border border-dashed border-border/40">
-          <div className="text-4xl mb-3">{"\u2194\uFE0F"}</div>
-          <p className="text-muted-foreground font-medium">Karsilastirmak icin operator arayip ekleyin</p>
-          <p className="text-xs text-muted-foreground/50 mt-1">Yukaridaki arama kutusunu kullanin</p>
-        </div>
-      ) : selectedData.length === 1 ? (
+      {/* Comparison results */}
+      {selectedData.length < 2 ? (
         <div className="text-center py-12 rounded-xl border border-dashed border-border/40">
-          <p className="text-muted-foreground">En az 2 operator secin</p>
+          <p className="text-muted-foreground text-sm">
+            {selectedData.length === 0
+              ? "Karsilastirmak icin listeden operator secin"
+              : "En az 2 operator secin"}
+          </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Side-by-side cards */}
           <div className={`grid gap-3 ${selectedData.length === 2 ? "grid-cols-2" : selectedData.length === 3 ? "grid-cols-3" : "grid-cols-2 lg:grid-cols-4"}`}>
             {selectedData.map((op) => {
@@ -187,12 +185,6 @@ export default function KarsilastirPage() {
                 .sort((a, b) => a - b)[0];
               return (
                 <div key={op.slug} className="rounded-xl border border-border/60 bg-card p-4 text-center">
-                  <button
-                    onClick={() => removeOperator(op.slug)}
-                    className="float-right text-muted-foreground/40 hover:text-red-400 transition-colors text-xs"
-                  >
-                    {"\u2715"}
-                  </button>
                   <div className="font-semibold text-sm mb-1">{op.name}</div>
                   {cheapest && (
                     <div className={`text-2xl font-extrabold tabular-nums ${getPriceColor(cheapest)}`}>
@@ -222,8 +214,7 @@ export default function KarsilastirPage() {
               <tbody>
                 {rows.map((row) => {
                   const vals = selectedData.map((op) => op.prices[row.key]?.min ?? null);
-                  const bestIdx = getBestIdx(vals, "min");
-
+                  const bestIdx = getBestIdx(vals);
                   return (
                     <tr key={row.key} className="border-b border-border/20">
                       <td className="px-4 py-3">
@@ -236,10 +227,10 @@ export default function KarsilastirPage() {
                         return (
                           <td key={op.slug} className="text-center px-3 py-3">
                             {price ? (
-                              <div className={`tabular-nums font-bold ${isBest ? "text-emerald-400" : getPriceColor(price.min)}`}>
+                              <span className={`tabular-nums font-bold ${isBest ? "text-emerald-400" : getPriceColor(price.min)}`}>
                                 {formatPrice(price)}
                                 {isBest && <span className="ml-1 text-[10px]">{"\u2713"}</span>}
-                              </div>
+                              </span>
                             ) : (
                               <span className="text-muted-foreground/30">-</span>
                             )}
@@ -254,30 +245,26 @@ export default function KarsilastirPage() {
                 <tr className="border-b border-border/20 bg-white/[0.01]">
                   <td className="px-4 py-3">
                     <div className="text-xs font-semibold">30 dk Maliyet</div>
-                    <div className="text-[10px] text-muted-foreground/50">DC ile tahmini</div>
+                    <div className="text-[10px] text-muted-foreground/50">DC ~50 kWh</div>
                   </td>
                   {(() => {
                     const costs = selectedData.map((op) => {
                       const dc = op.prices.DC?.min ?? op.prices.AC?.min;
-                      return dc ? Math.round(dc * 50 * 100) / 100 : null; // ~50 kWh in 30min DC
+                      return dc ? Math.round(dc * 50 * 100) / 100 : null;
                     });
-                    const bestIdx30 = getBestIdx(costs, "min");
-                    return selectedData.map((op, i) => {
-                      const cost = costs[i];
-                      const isBest = i === bestIdx30 && bestIdx30 !== -1;
-                      return (
-                        <td key={op.slug} className="text-center px-3 py-3">
-                          {cost ? (
-                            <div className={`tabular-nums font-bold ${isBest ? "text-emerald-400" : "text-foreground"}`}>
-                              {cost.toFixed(0)} TL
-                              {isBest && <span className="ml-1 text-[10px] text-emerald-400">{"\u2713"}</span>}
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground/30">-</span>
-                          )}
-                        </td>
-                      );
-                    });
+                    const bestIdx30 = getBestIdx(costs);
+                    return selectedData.map((op, i) => (
+                      <td key={op.slug} className="text-center px-3 py-3">
+                        {costs[i] ? (
+                          <span className={`tabular-nums font-bold ${i === bestIdx30 ? "text-emerald-400" : "text-foreground"}`}>
+                            {costs[i]!.toFixed(0)} TL
+                            {i === bestIdx30 && <span className="ml-1 text-[10px] text-emerald-400">{"\u2713"}</span>}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground/30">-</span>
+                        )}
+                      </td>
+                    ));
                   })()}
                 </tr>
 
@@ -298,14 +285,13 @@ export default function KarsilastirPage() {
             </table>
           </div>
 
-          {/* Visual bar comparison */}
+          {/* Visual bars */}
           <div className="rounded-xl border border-border/60 bg-card p-5">
-            <h3 className="text-xs font-semibold text-muted-foreground mb-4">Fiyat Karsilastirma</h3>
+            <h3 className="text-xs font-semibold text-muted-foreground mb-4">Gorsel Karsilastirma</h3>
             {rows.map((row) => {
               const vals = selectedData.map((op) => op.prices[row.key]?.min ?? 0).filter((v) => v > 0);
               if (vals.length === 0) return null;
               const maxVal = Math.max(...vals) * 1.1;
-
               return (
                 <div key={row.key} className="mb-4 last:mb-0">
                   <div className="text-[10px] text-muted-foreground/60 mb-1.5">{row.label} ({row.desc})</div>
