@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import type { OperatorWithPrices } from "@/lib/types";
 import { OperatorCard } from "./operator-card";
 import { AppLinks } from "./app-store-badges";
+import { OperatorFavicon } from "./operator-favicon";
 
 type SortKey = "price_asc" | "price_desc" | "name_asc" | "name_desc" | "ac_asc" | "ac_desc" | "dc_asc" | "dc_desc" | "hpc_asc" | "hpc_desc";
 type ViewMode = "grid" | "list";
@@ -58,10 +59,8 @@ function getSortFn(key: SortKey) {
 
 export function Dashboard({
   withPrices,
-  withoutPrices,
 }: {
   withPrices: OperatorWithPrices[];
-  withoutPrices: OperatorWithPrices[];
 }) {
   const [sortBy, setSortBy] = useState<SortKey>("price_asc");
   const [chargeFilter, setChargeFilter] = useState<ChargeFilter>("all");
@@ -78,7 +77,6 @@ export function Dashboard({
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [gridVisibleCount, setGridVisibleCount] = useState(6);
-  const [showNoPrices, setShowNoPrices] = useState(false);
 
   // Reset grid count when filters change
   const filterKey = `${searchQuery}-${chargeFilter}-${verifiedOnly}-${sortBy}`;
@@ -168,7 +166,7 @@ export function Dashboard({
                 : "bg-card border border-border/60 text-muted-foreground hover:text-foreground"
             }`}
           >
-            &#10003; Dogrulanmis
+            Sadece Dogrulanmis Fiyatlar
           </button>
 
           {/* Sort */}
@@ -231,6 +229,15 @@ export function Dashboard({
         </div>
       </div>
 
+      {/* Price color legend */}
+      <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-emerald-400"></span> &lt;9 TL Uygun</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-400"></span> 9-12 TL Orta</span>
+        <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-red-400"></span> &gt;12 TL Pahali</span>
+        <span className="flex items-center gap-1"><span className="text-emerald-400">{"\u2713"}</span> Dogrulanmis</span>
+        <span className="flex items-center gap-1"><span className="text-amber-400">{"\u26A0"}</span> 3. Parti</span>
+      </div>
+
       {/* Results */}
       {filtered.length === 0 ? (
         <div className="text-center py-16">
@@ -270,7 +277,7 @@ export function Dashboard({
                 <SortableTh label="DC (TL/kWh)" sortKey="dc_asc" currentSort={sortBy} onSort={setSortBy} align="right" />
                 <SortableTh label="HPC (TL/kWh)" sortKey="hpc_asc" currentSort={sortBy} onSort={setSortBy} align="right" />
                 <th className="text-center px-4 py-3 text-xs font-semibold text-muted-foreground">Uygulama</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Kaynak</th>
+                <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Fiyat Kaynagi</th>
               </tr>
             </thead>
             <tbody>
@@ -278,7 +285,8 @@ export function Dashboard({
                 <tr key={op.id} className="border-b border-border/20 hover:bg-white/[0.02] transition-colors">
                   <td className="px-4 py-3 text-muted-foreground/60 font-mono text-xs">{i + 1}</td>
                   <td className="px-4 py-3">
-                    <a href={`/operatorler/${op.slug}`} className="font-medium hover:text-primary transition-colors">
+                    <a href={`/operatorler/${op.slug}`} className="font-medium hover:text-primary transition-colors inline-flex items-center gap-2">
+                      <OperatorFavicon websiteUrl={op.websiteUrl} name={op.name} size={14} />
                       {op.name}
                     </a>
                   </td>
@@ -319,7 +327,16 @@ export function Dashboard({
                     <AppLinks playStoreUrl={op.playStoreUrl} appStoreUrl={op.appStoreUrl} compact />
                   </td>
                   <td className="px-4 py-3 text-right text-[10px] text-muted-foreground/50 max-w-[120px] truncate">
-                    {op.prices.AC?.source || op.prices.DC?.source || "-"}
+                    {(() => {
+                      const src = op.prices.AC?.source || op.prices.DC?.source;
+                      const url = op.prices.AC?.sourceUrl || op.prices.DC?.sourceUrl;
+                      if (!src) return "-";
+                      return url ? (
+                        <a href={url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                          {src} {"\u2197"}
+                        </a>
+                      ) : src;
+                    })()}
                   </td>
                 </tr>
               ))}
@@ -328,33 +345,6 @@ export function Dashboard({
         </div>
       )}
 
-      {/* Operators without prices */}
-      {withoutPrices.length > 0 && (
-        <section>
-          <button
-            onClick={() => setShowNoPrices(!showNoPrices)}
-            className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors mb-3"
-          >
-            <span className={`transition-transform ${showNoPrices ? "rotate-90" : ""}`}>{"\u25B6"}</span>
-            Fiyat Bilgisi Henuz Mevcut Degil ({withoutPrices.length})
-          </button>
-          {showNoPrices && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-              {withoutPrices.map((op, i) => (
-                <a
-                  key={op.id}
-                  href={`/operatorler/${op.slug}`}
-                  className="rounded-lg border border-border/40 p-2.5 hover:bg-white/[0.02] hover:border-primary/20 transition-all text-xs"
-                >
-                  <div className="font-medium truncate text-muted-foreground">
-                    <span className="text-muted-foreground/40 font-mono">{i + 1}.</span> {op.name}
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
     </div>
   );
 }

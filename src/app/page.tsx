@@ -10,9 +10,6 @@ export default async function Home() {
   const withPrices = data.filter(
     (op) => op.prices.AC || op.prices.DC || op.prices.HPC
   );
-  const withoutPrices = data.filter(
-    (op) => !op.prices.AC && !op.prices.DC && !op.prices.HPC
-  );
 
   // Stats
   const acOps = withPrices.filter((d) => d.prices.AC);
@@ -72,10 +69,7 @@ export default async function Home() {
       </div>
 
       {/* Dashboard */}
-      <Dashboard
-        withPrices={withPrices}
-        withoutPrices={withoutPrices}
-      />
+      <Dashboard withPrices={withPrices} />
     </div>
   );
 }

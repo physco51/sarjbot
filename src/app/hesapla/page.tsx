@@ -12,7 +12,8 @@ const VEHICLES = [
   { name: "Tesla Model S LR", batteryKWh: 100, effWh: 180, maxDC: 250, wltpKm: 560 },
   { name: "Tesla Model X LR", batteryKWh: 100, effWh: 200, maxDC: 250, wltpKm: 500 },
   // Togg
-  { name: "Togg T10F", batteryKWh: 88.5, effWh: 165, maxDC: 150, wltpKm: 535 },
+  { name: "Togg T10F Standart", batteryKWh: 52.4, effWh: 155, maxDC: 150, wltpKm: 327 },
+  { name: "Togg T10F Uzun Menzil", batteryKWh: 88.5, effWh: 165, maxDC: 150, wltpKm: 535 },
   { name: "Togg T10X Uzun Menzil", batteryKWh: 88.5, effWh: 180, maxDC: 150, wltpKm: 492 },
   { name: "Togg T10X Standart", batteryKWh: 52.4, effWh: 170, maxDC: 150, wltpKm: 314 },
   // BMW
@@ -138,6 +139,8 @@ const VEHICLES = [
 
 export default function HesaplaPage() {
   const [vehicleIdx, setVehicleIdx] = useState(0);
+  const [vehicleSearch, setVehicleSearch] = useState("");
+  const [vehicleOpen, setVehicleOpen] = useState(false);
   const [currentSoC, setCurrentSoC] = useState(20);
   const [targetSoC, setTargetSoC] = useState(80);
   const [pricePerKWh, setPricePerKWh] = useState(11.0);
@@ -204,18 +207,55 @@ export default function HesaplaPage() {
       </p>
 
       <div className="rounded-xl border border-border/60 bg-card p-6 space-y-6">
-        {/* Vehicle */}
-        <div>
+        {/* Vehicle - searchable dropdown */}
+        <div className="relative">
           <label className="block text-xs font-semibold text-muted-foreground mb-2">Arac Modeli</label>
-          <select
-            value={vehicleIdx}
-            onChange={(e) => setVehicleIdx(Number(e.target.value))}
-            className="w-full h-10 px-3 rounded-lg bg-background border border-border/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+          <button
+            type="button"
+            onClick={() => { setVehicleOpen(!vehicleOpen); setVehicleSearch(""); }}
+            className="w-full h-10 px-3 rounded-lg bg-background border border-border/60 text-sm text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-primary/50"
           >
-            {VEHICLES.map((v, i) => (
-              <option key={i} value={i}>{v.name} ({v.batteryKWh} kWh)</option>
-            ))}
-          </select>
+            <span className="truncate">{vehicle.name} ({vehicle.batteryKWh} kWh)</span>
+            <span className="text-muted-foreground/50 text-xs">{"\u25BC"}</span>
+          </button>
+          {vehicleOpen && (
+            <div className="absolute z-50 w-full mt-1 rounded-xl bg-card border border-border/60 shadow-xl overflow-hidden">
+              <div className="p-2 border-b border-border/40">
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Marka veya model ara..."
+                  value={vehicleSearch}
+                  onChange={(e) => setVehicleSearch(e.target.value)}
+                  className="w-full h-8 px-2 rounded-md bg-background border border-border/40 text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/50"
+                />
+              </div>
+              <div className="max-h-[240px] overflow-y-auto">
+                {VEHICLES.map((v, i) => {
+                  if (vehicleSearch.trim()) {
+                    const q = vehicleSearch.toLowerCase();
+                    if (!v.name.toLowerCase().includes(q)) return null;
+                  }
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => { setVehicleIdx(i); setVehicleOpen(false); }}
+                      className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between hover:bg-white/[0.04] transition-colors ${
+                        i === vehicleIdx ? "bg-primary/5 text-primary" : ""
+                      }`}
+                    >
+                      <span className="truncate">{v.name}</span>
+                      <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{v.batteryKWh} kWh</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {/* Close on outside click */}
+          {vehicleOpen && (
+            <div className="fixed inset-0 z-40" onClick={() => setVehicleOpen(false)} />
+          )}
         </div>
 
         {/* Vehicle info */}

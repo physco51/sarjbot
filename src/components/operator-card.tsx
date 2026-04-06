@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { OperatorWithPrices } from "@/lib/types";
 import { AppLinks } from "./app-store-badges";
+import { OperatorFavicon } from "./operator-favicon";
 
 function getPriceColor(price: number): string {
   if (price < 9) return "text-emerald-400";
@@ -73,6 +74,7 @@ export function OperatorCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground/60 font-mono">#{index + 1}</span>
+            <OperatorFavicon websiteUrl={op.websiteUrl} name={op.name} size={16} />
             <Link
               href={`/operatorler/${op.slug}`}
               className="font-semibold text-foreground hover:text-primary transition-colors truncate"
@@ -136,11 +138,18 @@ export function OperatorCard({
       {/* App links + Source */}
       <div className="flex items-center justify-between">
         <AppLinks playStoreUrl={op.playStoreUrl} appStoreUrl={op.appStoreUrl} compact />
-        {(op.prices.AC?.source || op.prices.DC?.source) && (
-          <div className="text-[10px] text-muted-foreground/50 truncate">
-            {op.prices.AC?.source || op.prices.DC?.source}
-          </div>
-        )}
+        {(() => {
+          const src = op.prices.AC?.source || op.prices.DC?.source;
+          const url = op.prices.AC?.sourceUrl || op.prices.DC?.sourceUrl;
+          if (!src) return null;
+          return url ? (
+            <a href={url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground/50 hover:text-primary truncate transition-colors">
+              Fiyat Kaynagi: {src} {"\u2197"}
+            </a>
+          ) : (
+            <div className="text-[10px] text-muted-foreground/50 truncate">Fiyat Kaynagi: {src}</div>
+          );
+        })()}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { PriceInfo } from "@/lib/types";
 import { AppLinks } from "@/components/app-store-badges";
+import { OperatorFavicon } from "@/components/operator-favicon";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +48,10 @@ export default async function OperatorPage({
       <div className="mb-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{operator.name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-3">
+              <OperatorFavicon websiteUrl={operator.websiteUrl} name={operator.name} size={28} />
+              {operator.name}
+            </h1>
             {operator.description && (
               <p className="text-muted-foreground mt-1">{operator.description}</p>
             )}

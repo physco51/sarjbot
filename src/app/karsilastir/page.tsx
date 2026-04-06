@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import type { OperatorWithPrices } from "@/lib/types";
+import { OperatorFavicon } from "@/components/operator-favicon";
 
 function getPriceColor(price: number): string {
   if (price < 9) return "text-emerald-400";
@@ -149,7 +150,8 @@ export default function KarsilastirPage() {
                 </div>
 
                 {/* Name + verified */}
-                <span className={`flex-1 truncate ${isSelected ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
+                <span className={`flex-1 truncate inline-flex items-center gap-1.5 ${isSelected ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
+                  <OperatorFavicon websiteUrl={op.websiteUrl} name={op.name} size={14} />
                   {op.name}
                   {(op.prices.AC?.isVerified || op.prices.DC?.isVerified || op.prices.HPC?.isVerified) ? (
                     <span className="ml-1 text-emerald-400 text-[10px]">{"\u2713"}</span>
