@@ -464,22 +464,22 @@ export default function HesaplaPage() {
         {result && result.energyNeeded > 0 && (
           <div className="border-t border-border/40 pt-5 space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <ResultItem label="Sarj edilecek" value={`${result.energyNeeded} kWh`} />
+              <ResultItem label="Batarya Sarj Miktari" value={`${result.energyNeeded} kWh`} />
               <ResultItem
-                label="Tahmini sure"
+                label="Tahmini Sarj Suresi"
                 value={`~${result.chargingMinutes} dk`}
                 sub={result.chargingMinutes > 60 ? `(${Math.floor(result.chargingMinutes / 60)} saat ${result.chargingMinutes % 60} dk) ${result.power} kW` : `${result.power} kW`}
               />
-              <ResultItem label="Toplam maliyet" value={`${result.totalCost.toFixed(2)} TL`} highlight />
-              <ResultItem label="Kazanilan menzil" value={`~${result.rangeKm} km`} />
-              <ResultItem label="TL/km (elektrik)" value={`${result.costPerKm.toFixed(2)} TL`} />
-              <ResultItem label={`TL/km (${fuelType})`} value={`${result.gasCostPerKm.toFixed(2)} TL`} />
+              <ResultItem label="Toplam Sarj Maliyeti" value={`${result.totalCost.toFixed(2)} TL`} highlight />
+              <ResultItem label="Kazanilan Menzil" value={`~${result.rangeKm} km`} />
+              <ResultItem label={`TL/Km (${fuelType === "benzin" ? "Benzin" : "Motorin"})`} value={`${result.gasCostPerKm.toFixed(2)} TL`} />
+              <ResultItem label="TL/Km (Elektrik)" value={`${result.costPerKm.toFixed(2)} TL`} />
               <ResultItem
-                label={`${fuelType === "benzin" ? "Benzin" : "Mazot"} Maliyeti`}
+                label={`${fuelType === "benzin" ? "Benzin" : "Motorin"} Maliyeti`}
                 value={`${result.gasCost.toFixed(2)} TL`}
-                sub={`${gasLPer100km}L/100km, ${gasPricePerL.toFixed(2)} TL/L`}
+                sub={`~${result.rangeKm} km icin`}
               />
-              <ResultItem label="Elektrik maliyeti" value={`${result.totalCost.toFixed(2)} TL`} sub={`${result.rangeKm} km icin`} />
+              <ResultItem label="Elektrik Maliyeti" value={`${result.totalCost.toFixed(2)} TL`} sub={`~${result.rangeKm} km icin`} />
             </div>
 
             {/* Savings banner */}
