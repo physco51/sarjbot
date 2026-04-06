@@ -41,7 +41,7 @@ export default async function OperatorPage({
         href="/"
         className="text-sm text-muted-foreground hover:text-primary transition-colors mb-6 inline-flex items-center gap-1"
       >
-        &#8592; Tum Operatorler
+        &#8592; Tüm Operatörler
       </Link>
 
       {/* Hero */}
@@ -89,9 +89,9 @@ export default async function OperatorPage({
           {(["AC", "DC", "HPC"] as const).map((type) => {
             const price = operator.prices[type];
             const config = {
-              AC: { title: "AC Sarj", desc: "22 kW - Yavas sarj", icon: "\u26A1", border: "border-emerald-500/30", bg: "bg-emerald-500/5" },
-              DC: { title: "DC Hizli", desc: "180 kW'a kadar", icon: "\u26A1\u26A1", border: "border-sky-500/30", bg: "bg-sky-500/5" },
-              HPC: { title: "HPC Ultra Hizli", desc: "180 kW uzeri", icon: "\u26A1\u26A1\u26A1", border: "border-violet-500/30", bg: "bg-violet-500/5" },
+              AC: { title: "AC Şarj", desc: "22 kW - Yavaş şarj", icon: "\u26A1", border: "border-emerald-500/30", bg: "bg-emerald-500/5" },
+              DC: { title: "DC Hızlı", desc: "180 kW'a kadar", icon: "\u26A1\u26A1", border: "border-sky-500/30", bg: "bg-sky-500/5" },
+              HPC: { title: "HPC Ultra Hızlı", desc: "180 kW uzeri", icon: "\u26A1\u26A1\u26A1", border: "border-violet-500/30", bg: "bg-violet-500/5" },
             }[type];
 
             return (
@@ -108,9 +108,9 @@ export default async function OperatorPage({
                     </div>
                     <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                       {price.isVerified ? (
-                        <span className="text-emerald-400">&#10003; Dogrulanmis</span>
+                        <span className="text-emerald-400">&#10003; Doğrulanmış</span>
                       ) : (
-                        <span className="text-amber-400">&#9888; Dogrulanmamis</span>
+                        <span className="text-amber-400">&#9888; Doğrulanmamış</span>
                       )}
                       {price.source && (
                         <>
@@ -137,16 +137,16 @@ export default async function OperatorPage({
       ) : (
         <div className="rounded-xl border border-border/60 bg-card p-8 text-center mb-8">
           <div className="text-3xl mb-2">&#128269;</div>
-          <p className="text-muted-foreground">Bu operatorun fiyat bilgisi henuz mevcut degil.</p>
-          <p className="text-xs text-muted-foreground/50 mt-1">Resmi sitesi uzerinden guncellenmeye calisilmaktadir.</p>
+          <p className="text-muted-foreground">Bu operatörün fiyat bilgisi henüz mevcut değil.</p>
+          <p className="text-xs text-muted-foreground/50 mt-1">Resmi sitesi üzerinden güncellenmeye çalışılmaktadır.</p>
         </div>
       )}
 
       {/* Info Table */}
       <div className="rounded-xl border border-border/60 bg-card p-5">
-        <h2 className="text-sm font-semibold text-muted-foreground mb-4">Operator Bilgileri</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground mb-4">Operatör Bilgileri</h2>
         <div className="space-y-3 text-sm">
-          <InfoRow label="Operator" value={operator.name} />
+          <InfoRow label="Operatör" value={operator.name} />
           {operator.websiteUrl && (
             <InfoRow
               label="Web Sitesi"

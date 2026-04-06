@@ -36,18 +36,18 @@ export default async function Home() {
       {/* Hero */}
       <div className="mb-8">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
-          Turkiye <span className="text-primary">EV Sarj</span> Fiyatlari
+          Türkiye <span className="text-primary">EV Şarj</span> Fiyatları
         </h1>
         <p className="text-muted-foreground max-w-2xl">
-          {data.length} operatorun guncel fiyatlarini tek bir yerde karsilastirin.
-          <span className="text-foreground font-medium"> {withPrices.length}</span> operatorun fiyati mevcut.
+          {data.length} operatörün güncel fiyatlarını tek bir yerde karşılaştırın.
+          <span className="text-foreground font-medium"> {withPrices.length}</span> operatörün fiyatı mevcut.
         </p>
         <SonGuncelleme lastUpdated={lastUpdated} />
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <StatCard label="Toplam Operator" value={data.length.toString()} icon={"\u26A1"} />
+        <StatCard label="Toplam Operatör" value={data.length.toString()} icon={"\u26A1"} />
         <StatCard
           label="En Ucuz AC"
           value={cheapestAC ? `${cheapestAC.prices.AC!.min.toFixed(2)} TL` : "-"}

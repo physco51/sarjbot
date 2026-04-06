@@ -5,12 +5,12 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <span className="text-primary">{"\u26A1"}</span>
-            <span className="font-semibold text-foreground">SarjBot</span>
+            <span className="font-semibold text-foreground">ŞarjBot</span>
             <span className="text-muted-foreground/60">|</span>
-            <span>Turkiye EV Sarj Fiyat Karsilastirma</span>
+            <span>Türkiye EV Şarj Fiyat Karşılaştırma</span>
           </div>
           <p className="text-xs text-muted-foreground/60 text-center">
-            Fiyatlar bilgi amaclidir. Guncel fiyatlar icin operatorlerin resmi sitelerini kontrol edin.
+            Fiyatlar bilgi amaçlıdır. Güncel fiyatlar için operatörlerin resmi sitelerini kontrol edin.
           </p>
         </div>
       </div>

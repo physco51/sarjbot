@@ -91,10 +91,10 @@ export default function KarsilastirPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
-        Operator <span className="text-primary">Karsilastir</span>
+        Operatör <span className="text-primary">Karşılaştır</span>
       </h1>
       <p className="text-sm text-muted-foreground mb-6">
-        Listeden en fazla 4 operator secin, fiyatlarini yan yana karsilastirin.
+        Listeden en fazla 4 operatör seçin, fiyatlarını yan yana karşılaştırın.
       </p>
 
       {/* Operator list with checkboxes */}
@@ -116,7 +116,7 @@ export default function KarsilastirPage() {
                 : "bg-background border border-border/40 text-muted-foreground hover:text-foreground"
             }`}
           >
-            Sadece Dogrulanmis Fiyatlar
+            Sadece Doğrulanmış Fiyatlar
           </button>
         </div>
 
@@ -183,7 +183,7 @@ export default function KarsilastirPage() {
 
         {/* Footer */}
         <div className="px-3 py-2 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
-          <span>{selectedSlugs.length}/4 secili</span>
+          <span>{selectedSlugs.length}/4 seçili</span>
           {selectedSlugs.length > 0 && (
             <button onClick={() => setSelectedSlugs([])} className="text-red-400 hover:text-red-300">
               Temizle
@@ -197,8 +197,8 @@ export default function KarsilastirPage() {
         <div className="text-center py-12 rounded-xl border border-dashed border-border/40">
           <p className="text-muted-foreground text-sm">
             {selectedData.length === 0
-              ? "Karsilastirmak icin listeden operator secin"
-              : "En az 2 operator secin"}
+              ? "Karşılaştırmak için listeden operatör seçin"
+              : "En az 2 operatör seçin"}
           </p>
         </div>
       ) : (
@@ -218,7 +218,7 @@ export default function KarsilastirPage() {
                       <span className="text-xs font-normal text-muted-foreground ml-1">TL</span>
                     </div>
                   )}
-                  <div className="text-[10px] text-muted-foreground/50 mt-1">en dusuk fiyat</div>
+                  <div className="text-[10px] text-muted-foreground/50 mt-1">en düşük fiyat</div>
                 </div>
               );
             })}
@@ -322,7 +322,7 @@ export default function KarsilastirPage() {
 
           {/* Visual bars */}
           <div className="rounded-xl border border-border/60 bg-card p-5">
-            <h3 className="text-xs font-semibold text-muted-foreground mb-4">Gorsel Karsilastirma</h3>
+            <h3 className="text-xs font-semibold text-muted-foreground mb-4">Görsel Karşılaştırma</h3>
             {rows.map((row) => {
               const vals = selectedData.map((op) => op.prices[row.key]?.min ?? 0).filter((v) => v > 0);
               if (vals.length === 0) return null;

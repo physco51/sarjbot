@@ -1,27 +1,27 @@
 import type { Metadata } from "next";
-import { Outfit, DM_Sans } from "next/font/google";
+import { Inter, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
-const outfit = Outfit({
+const inter = Inter({
   variable: "--font-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
-const dmSans = DM_Sans({
+const nunitoSans = Nunito_Sans({
   variable: "--font-body",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "SarjBot — Turkiye EV Sarj Fiyat Karsilastirma",
+  title: "ŞarjBot — Türkiye EV Şarj Fiyat Karşılaştırma",
   description:
-    "Turkiye'deki tum elektrikli arac sarj istasyonlarinin guncel fiyatlarini karsilastirin. ZES, Trugo, Esarj, Voltrun ve daha fazlasi.",
+    "Türkiye'deki tüm elektrikli araç şarj istasyonlarının güncel fiyatlarını karşılaştırın. ZES, Trugo, Eşarj, Voltrun ve daha fazlası.",
   keywords:
-    "elektrikli arac, sarj istasyonu, fiyat karsilastirma, ZES, Trugo, Esarj, Turkiye, kWh fiyat",
+    "elektrikli araç, şarj istasyonu, fiyat karşılaştırma, ZES, Trugo, Eşarj, Türkiye, kWh fiyat",
 };
 
 export default function RootLayout({
@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${outfit.variable} ${dmSans.variable} h-full antialiased`}
+      className={`${inter.variable} ${nunitoSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <Header />

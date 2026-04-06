@@ -11,15 +11,15 @@ export function Header() {
             </div>
             <div>
               <span className="text-lg font-bold tracking-tight text-foreground">
-                Sarj<span className="text-primary">Bot</span>
+                Şarj<span className="text-primary">Bot</span>
               </span>
             </div>
           </Link>
           <nav className="flex items-center gap-1">
             <NavLink href="/">Fiyatlar</NavLink>
-            <NavLink href="/karsilastir">Karsilastir</NavLink>
+            <NavLink href="/karsilastir">Karşılaştır</NavLink>
             <NavLink href="/hesapla">Hesapla</NavLink>
-            <NavLink href="/hakkinda">Hakkinda</NavLink>
+            <NavLink href="/hakkinda">Hakkında</NavLink>
           </nav>
         </div>
       </div>

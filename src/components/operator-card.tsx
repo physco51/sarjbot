@@ -144,10 +144,10 @@ export function OperatorCard({
           if (!src) return null;
           return url ? (
             <a href={url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground/50 hover:text-primary truncate transition-colors">
-              Fiyat Kaynagi: {src} {"\u2197"}
+              Fiyat Kaynağı: {src} {"\u2197"}
             </a>
           ) : (
-            <div className="text-[10px] text-muted-foreground/50 truncate">Fiyat Kaynagi: {src}</div>
+            <div className="text-[10px] text-muted-foreground/50 truncate">Fiyat Kaynağı: {src}</div>
           );
         })()}
       </div>

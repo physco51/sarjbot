@@ -130,7 +130,7 @@ export function Dashboard({
           <div className="relative flex-1 max-w-xs">
             <input
               type="text"
-              placeholder="Operator ara..."
+              placeholder="Operatör ara..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-9 px-3 pl-9 rounded-lg bg-card border border-border/60 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -143,12 +143,12 @@ export function Dashboard({
             {(["all", "AC", "DC", "HPC"] as ChargeFilter[]).map((f) => (
               <button key={f} onClick={() => handleChargeFilter(f)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${chargeFilter === f ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" : "bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/30"}`}
-              >{f === "all" ? "Tumu" : f}</button>
+              >{f === "all" ? "Tümü" : f}</button>
             ))}
           </div>
           <button onClick={() => setVerifiedOnly(!verifiedOnly)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${verifiedOnly ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-card border border-border/60 text-muted-foreground hover:text-foreground"}`}
-          >Sadece Dogrulanmis Fiyatlar</button>
+          >Sadece Doğrulanmış Fiyatlar</button>
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)}
             className="h-9 px-3 rounded-lg bg-card border border-border/60 text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
           >{SORT_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}</select>
@@ -175,13 +175,13 @@ export function Dashboard({
             {(["all", "AC", "DC", "HPC"] as ChargeFilter[]).map((f) => (
               <button key={f} onClick={() => handleChargeFilter(f)}
                 className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition-all shrink-0 ${chargeFilter === f ? "bg-primary text-primary-foreground" : "bg-card border border-border/60 text-muted-foreground"}`}
-              >{f === "all" ? "Tumu" : f}</button>
+              >{f === "all" ? "Tümü" : f}</button>
             ))}
           </div>
           <div className="flex items-center gap-1.5">
             <button onClick={() => setVerifiedOnly(!verifiedOnly)}
               className={`px-2 py-1 rounded-lg text-[10px] font-medium transition-all shrink-0 ${verifiedOnly ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-card border border-border/60 text-muted-foreground"}`}
-            >Sadece Dogrulanmis Fiyatlar</button>
+            >Sadece Doğrulanmış Fiyatlar</button>
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)}
               className="h-7 px-1.5 rounded-lg bg-card border border-border/60 text-[10px] font-medium text-foreground focus:outline-none cursor-pointer flex-1 min-w-0"
             >{SORT_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}</select>
@@ -198,7 +198,7 @@ export function Dashboard({
 
         {/* Active filters & result count */}
         <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">{filtered.length}</span> operator bulundu
+          <span className="font-medium text-foreground">{filtered.length}</span> operatör bulundu
           {searchQuery && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary">
               &ldquo;{searchQuery}&rdquo;
@@ -213,7 +213,7 @@ export function Dashboard({
           )}
           {verifiedOnly && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400">
-              Dogrulanmis
+              Doğrulanmış
               <button onClick={() => setVerifiedOnly(false)} className="hover:text-foreground">&#10005;</button>
             </span>
           )}
@@ -225,7 +225,7 @@ export function Dashboard({
         <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-emerald-400"></span> &lt;9 TL Uygun</span>
         <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-amber-400"></span> 9-12 TL Orta</span>
         <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-red-400"></span> &gt;12 TL Pahali</span>
-        <span className="flex items-center gap-1"><span className="text-emerald-400">{"\u2713"}</span> Dogrulanmis</span>
+        <span className="flex items-center gap-1"><span className="text-emerald-400">{"\u2713"}</span> Doğrulanmış</span>
         <span className="flex items-center gap-1"><span className="text-amber-400">{"\u26A0"}</span> 3. Parti</span>
       </div>
 
@@ -233,8 +233,8 @@ export function Dashboard({
       {filtered.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-4xl mb-3">&#128269;</div>
-          <p className="text-muted-foreground font-medium">Sonuc bulunamadi</p>
-          <p className="text-sm text-muted-foreground/60 mt-1">Filtrelerinizi genisletin</p>
+          <p className="text-muted-foreground font-medium">Sonuç bulunamadı</p>
+          <p className="text-sm text-muted-foreground/60 mt-1">Filtrelerinizi genişletin</p>
         </div>
       ) : viewMode === "grid" ? (
         <>
@@ -249,7 +249,7 @@ export function Dashboard({
                 onClick={() => setGridVisibleCount((c) => c + 6)}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-white/[0.03] transition-all"
               >
-                Daha fazla goster
+                Daha fazla göster
                 <span className="text-xs text-muted-foreground/50">
                   ({gridVisibleCount}/{filtered.length})
                 </span>
@@ -268,7 +268,7 @@ export function Dashboard({
                 <SortableTh label="DC (TL/kWh)" sortKey="dc_asc" currentSort={sortBy} onSort={setSortBy} align="right" />
                 <SortableTh label="HPC (TL/kWh)" sortKey="hpc_asc" currentSort={sortBy} onSort={setSortBy} align="right" />
                 <th className="text-center px-4 py-3 text-xs font-semibold text-muted-foreground">Uygulama</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Fiyat Kaynagi</th>
+                <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Fiyat Kaynağı</th>
               </tr>
             </thead>
             <tbody>

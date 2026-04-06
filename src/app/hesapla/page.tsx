@@ -280,13 +280,13 @@ export default function HesaplaPage() {
         Maliyet <span className="text-primary">Hesapla</span>
       </h1>
       <p className="text-sm text-muted-foreground mb-8">
-        Sarj maliyetinizi ve benzinli/dizel araca gore tasarrufunuzu hesaplayin.
+        Şarj maliyetinizi ve benzinli/dizel araca göre tasarrufunuzu hesaplayın.
       </p>
 
       <div className="rounded-xl border border-border/60 bg-card p-6 space-y-6">
         {/* Vehicle - searchable dropdown */}
         <div className="relative">
-          <label className="block text-xs font-semibold text-muted-foreground mb-2">Arac Modeli</label>
+          <label className="block text-xs font-semibold text-muted-foreground mb-2">Araç Modeli</label>
           <button
             type="button"
             onClick={() => { setVehicleOpen(!vehicleOpen); setVehicleSearch(""); }}
@@ -348,7 +348,7 @@ export default function HesaplaPage() {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border/30 pt-1.5">
-            <div>Isi Pompasi: <span className={`font-semibold ${vehicle.heatPump ? "text-emerald-400" : "text-muted-foreground/60"}`}>{vehicle.heatPump ? "Var" : "Yok"}</span></div>
+            <div>Isı Pompası: <span className={`font-semibold ${vehicle.heatPump ? "text-emerald-400" : "text-muted-foreground/60"}`}>{vehicle.heatPump ? "Var" : "Yok"}</span></div>
             <div>Batarya: <span className="font-semibold text-foreground">{vehicle.batteryType}</span></div>
             <div>Batarya Garantisi: <span className="font-semibold text-foreground">{vehicle.warranty}</span></div>
             <div>Cd: <span className="font-semibold text-foreground">{vehicle.cd}</span></div>
@@ -357,7 +357,7 @@ export default function HesaplaPage() {
 
         {/* Charge type */}
         <div>
-          <label className="block text-xs font-semibold text-muted-foreground mb-2">Sarj Tipi</label>
+          <label className="block text-xs font-semibold text-muted-foreground mb-2">Şarj Tipi</label>
           <div className="flex gap-2">
             {([
               { key: "home" as const, label: `\u{1F3E0} Ev (3.7 kW)` },
@@ -382,7 +382,7 @@ export default function HesaplaPage() {
         {/* SoC inputs */}
         <div className="grid grid-cols-2 gap-4">
           <SliderWithInput
-            label="Mevcut Sarj"
+            label="Mevcut Şarj"
             value={currentSoC}
             onChange={setCurrentSoC}
             min={0}
@@ -391,7 +391,7 @@ export default function HesaplaPage() {
             unit="%"
           />
           <SliderWithInput
-            label="Hedef Sarj"
+            label="Hedef Şarj"
             value={targetSoC}
             onChange={setTargetSoC}
             min={0}
@@ -403,7 +403,7 @@ export default function HesaplaPage() {
 
         {/* Price input */}
         <SliderWithInput
-          label={priceLabel ? `kWh Fiyati (${priceLabel})` : "kWh Fiyati"}
+          label={priceLabel ? `kWh Fiyatı (${priceLabel})` : "kWh Fiyati"}
           value={pricePerKWh}
           onChange={(v) => { setPricePerKWh(v); setPriceLabel(""); }}
           min={1}
@@ -414,7 +414,7 @@ export default function HesaplaPage() {
 
         {/* Fuel comparison section */}
         <div className="border-t border-border/40 pt-5">
-          <h3 className="text-xs font-semibold text-muted-foreground mb-3">Yakit Karsilastirma</h3>
+          <h3 className="text-xs font-semibold text-muted-foreground mb-3">Yakıt Karşılaştırma</h3>
 
           {/* Fuel type toggle */}
           <div className="flex gap-2 mb-4">
@@ -443,13 +443,13 @@ export default function HesaplaPage() {
                 <span className="text-xs text-primary font-bold tabular-nums">{gasPricePerL.toFixed(2)} TL/L</span>
               </div>
               <div className="text-[10px] text-muted-foreground/50">
-                {fuelLoading ? "Yukleniyor..." : "Petrol Ofisi - Istanbul Avrupa"}
+                {fuelLoading ? "Yükleniyor..." : "Petrol Ofisi - Istanbul Avrupa"}
               </div>
             </div>
 
             {/* Consumption per 100km */}
             <SliderWithInput
-              label="100 km Tuketim"
+              label="100 km Tüketim"
               value={gasLPer100km}
               onChange={setGasLPer100km}
               min={3}
@@ -464,22 +464,22 @@ export default function HesaplaPage() {
         {result && result.energyNeeded > 0 && (
           <div className="border-t border-border/40 pt-5 space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <ResultItem label="Batarya Sarj Miktari" value={`${result.energyNeeded} kWh`} />
+              <ResultItem label="Batarya Şarj Miktarı" value={`${result.energyNeeded} kWh`} />
               <ResultItem
-                label="Tahmini Sarj Suresi"
+                label="Tahmini Şarj Süresi"
                 value={`~${result.chargingMinutes} dk`}
                 sub={result.chargingMinutes > 60 ? `(${Math.floor(result.chargingMinutes / 60)} saat ${result.chargingMinutes % 60} dk) ${result.power} kW` : `${result.power} kW`}
               />
-              <ResultItem label="Toplam Sarj Maliyeti" value={`${result.totalCost.toFixed(2)} TL`} highlight />
-              <ResultItem label="Kazanilan Menzil" value={`~${result.rangeKm} km`} />
+              <ResultItem label="Toplam Şarj Maliyeti" value={`${result.totalCost.toFixed(2)} TL`} highlight />
+              <ResultItem label="Kazanılan Menzil" value={`~${result.rangeKm} km`} />
               <ResultItem label={`TL/Km (${fuelType === "benzin" ? "Benzin" : "Motorin"})`} value={`${result.gasCostPerKm.toFixed(2)} TL`} />
               <ResultItem label="TL/Km (Elektrik)" value={`${result.costPerKm.toFixed(2)} TL`} />
               <ResultItem
                 label={`${fuelType === "benzin" ? "Benzin" : "Motorin"} Maliyeti`}
                 value={`${result.gasCost.toFixed(2)} TL`}
-                sub={`~${result.rangeKm} km icin`}
+                sub={`~${result.rangeKm} km için`}
               />
-              <ResultItem label="Elektrik Maliyeti" value={`${result.totalCost.toFixed(2)} TL`} sub={`~${result.rangeKm} km icin`} />
+              <ResultItem label="Elektrik Maliyeti" value={`${result.totalCost.toFixed(2)} TL`} sub={`~${result.rangeKm} km için`} />
             </div>
 
             {/* Savings banner */}
@@ -487,12 +487,12 @@ export default function HesaplaPage() {
               <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-4 text-center">
                 <div className="text-2xl font-extrabold text-emerald-400">%{result.savingsPercent} tasarruf!</div>
                 <div className="text-xs text-emerald-400/70 mt-1">
-                  ~{result.rangeKm} km menzil icin {fuelType === "benzin" ? "benzinli" : "dizel"} araca gore {(result.gasCost - result.totalCost).toFixed(2)} TL daha ucuz
+                  ~{result.rangeKm} km menzil icin {fuelType === "benzin" ? "benzinli" : "dizel"} araca göre {(result.gasCost - result.totalCost).toFixed(2)} TL daha ucuz
                 </div>
               </div>
             ) : (
               <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-4 text-center">
-                <div className="text-lg font-extrabold text-amber-400">Elektrik daha pahali</div>
+                <div className="text-lg font-extrabold text-amber-400">Elektrik daha pahalı</div>
                 <div className="text-xs text-amber-400/70 mt-1">
                   ~{result.rangeKm} km menzil icin {fuelType === "benzin" ? "benzinli" : "dizel"} arac {(result.totalCost - result.gasCost).toFixed(2)} TL daha ucuz
                 </div>
