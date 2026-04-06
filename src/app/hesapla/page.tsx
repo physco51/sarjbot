@@ -173,15 +173,18 @@ export default function HesaplaPage() {
   const [currentSoC, setCurrentSoC] = useState(20);
   const [targetSoC, setTargetSoC] = useState(80);
   const [pricePerKWh, setPricePerKWh] = useState(11.0);
+  const [priceLabel, setPriceLabel] = useState("");
   const [chargeType, setChargeType] = useState<"home" | "AC" | "DC">("DC");
   const [gasLPer100km, setGasLPer100km] = useState(7.0);
   const [fuelType, setFuelType] = useState<"benzin" | "motorin">("benzin");
   const [fuelPrices, setFuelPrices] = useState({ benzin: 62.60, motorin: 77.47 });
   const [fuelLoading, setFuelLoading] = useState(true);
+  const [cheapestAC, setCheapestAC] = useState<{ price: number; name: string } | null>(null);
+  const [cheapestDC, setCheapestDC] = useState<{ price: number; name: string } | null>(null);
 
   const vehicle = VEHICLES[vehicleIdx];
 
-  // Fetch fuel prices from API
+  // Fetch fuel prices + operator prices
   useEffect(() => {
     fetch("/api/akaryakit")
       .then((r) => r.json())
@@ -192,7 +195,45 @@ export default function HesaplaPage() {
       })
       .catch(() => {})
       .finally(() => setFuelLoading(false));
+
+    fetch("/api/fiyatlar")
+      .then((r) => r.json())
+      .then((ops: { name: string; prices: { AC: { min: number } | null; DC: { min: number } | null } }[]) => {
+        let bestAC: { price: number; name: string } | null = null;
+        let bestDC: { price: number; name: string } | null = null;
+        for (const op of ops) {
+          if (op.prices.AC && (!bestAC || op.prices.AC.min < bestAC.price)) {
+            bestAC = { price: op.prices.AC.min, name: op.name };
+          }
+          if (op.prices.DC && (!bestDC || op.prices.DC.min < bestDC.price)) {
+            bestDC = { price: op.prices.DC.min, name: op.name };
+          }
+        }
+        setCheapestAC(bestAC);
+        setCheapestDC(bestDC);
+        // Set initial DC price
+        if (bestDC) {
+          setPricePerKWh(bestDC.price);
+          setPriceLabel(bestDC.name);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  // Auto-set price when charge type changes
+  const handleChargeType = (t: "home" | "AC" | "DC") => {
+    setChargeType(t);
+    if (t === "home") {
+      setPricePerKWh(2.59);
+      setPriceLabel("Mesken tarifesi");
+    } else if (t === "AC" && cheapestAC) {
+      setPricePerKWh(cheapestAC.price);
+      setPriceLabel(cheapestAC.name);
+    } else if (t === "DC" && cheapestDC) {
+      setPricePerKWh(cheapestDC.price);
+      setPriceLabel(cheapestDC.name);
+    }
+  };
 
   const gasPricePerL = fuelPrices[fuelType];
 
@@ -310,7 +351,7 @@ export default function HesaplaPage() {
             ]).map(({ key, label }) => (
               <button
                 key={key}
-                onClick={() => setChargeType(key)}
+                onClick={() => handleChargeType(key)}
                 className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                   chargeType === key
                     ? "bg-primary text-primary-foreground"
@@ -347,9 +388,9 @@ export default function HesaplaPage() {
 
         {/* Price input */}
         <SliderWithInput
-          label="kWh Fiyati"
+          label={priceLabel ? `kWh Fiyati (${priceLabel})` : "kWh Fiyati"}
           value={pricePerKWh}
-          onChange={setPricePerKWh}
+          onChange={(v) => { setPricePerKWh(v); setPriceLabel(""); }}
           min={1}
           max={25}
           step={0.01}
