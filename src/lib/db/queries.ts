@@ -1,7 +1,15 @@
 import { db } from "./index";
-import { operators, prices } from "./schema";
-import { eq } from "drizzle-orm";
+import { operators, prices, priceHistory } from "./schema";
+import { eq, desc } from "drizzle-orm";
 import type { OperatorWithPrices, PriceInfo } from "../types";
+
+export interface PriceHistoryRecord {
+  id: number;
+  chargeType: "AC" | "DC" | "HPC";
+  priceMin: number;
+  priceMax: number | null;
+  recordedAt: Date | null;
+}
 
 function toPriceInfo(p: typeof prices.$inferSelect): PriceInfo {
   return {
@@ -52,4 +60,24 @@ export async function getAllOperatorsWithPrices(): Promise<OperatorWithPrices[]>
 export async function getOperatorBySlug(slug: string): Promise<OperatorWithPrices | null> {
   const all = await getAllOperatorsWithPrices();
   return all.find((o) => o.slug === slug) ?? null;
+}
+
+export async function getPriceHistoryBySlug(slug: string): Promise<PriceHistoryRecord[]> {
+  const op = db.select().from(operators).where(eq(operators.slug, slug)).get();
+  if (!op) return [];
+
+  const history = db
+    .select()
+    .from(priceHistory)
+    .where(eq(priceHistory.operatorId, op.id))
+    .orderBy(desc(priceHistory.recordedAt))
+    .all();
+
+  return history.map((h) => ({
+    id: h.id,
+    chargeType: h.chargeType as "AC" | "DC" | "HPC",
+    priceMin: h.priceMin,
+    priceMax: h.priceMax,
+    recordedAt: h.recordedAt,
+  }));
 }

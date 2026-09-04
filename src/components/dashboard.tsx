@@ -5,6 +5,7 @@ import type { OperatorWithPrices } from "@/lib/types";
 import { OperatorCard } from "./operator-card";
 import { AppLinks } from "./app-store-badges";
 import { OperatorFavicon } from "./operator-favicon";
+import { ExportButton } from "./export-button";
 
 type SortKey = "price_asc" | "price_desc" | "name_asc" | "name_desc" | "ac_asc" | "ac_desc" | "dc_asc" | "dc_desc" | "hpc_asc" | "hpc_desc";
 type ViewMode = "grid" | "list";
@@ -160,6 +161,7 @@ export function Dashboard({
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path fillRule="evenodd" d="M2.5 12a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4a.5.5 0 01.5-.5h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z" /></svg>
             </button>
           </div>
+          <ExportButton data={filtered} />
         </div>
 
         {/* Mobile: two compact rows */}

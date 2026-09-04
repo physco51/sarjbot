@@ -1,11 +1,31 @@
-import { getOperatorBySlug } from "@/lib/db/queries";
+import { getOperatorBySlug, getPriceHistoryBySlug } from "@/lib/db/queries";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import type { PriceInfo } from "@/lib/types";
 import { AppLinks } from "@/components/app-store-badges";
 import { OperatorFavicon } from "@/components/operator-favicon";
+import { PriceHistoryChart } from "@/components/price-history-chart";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const operator = await getOperatorBySlug(slug);
+
+  if (!operator) {
+    return { title: "Operatör Bulunamadı | ŞarjBot" };
+  }
+
+  return {
+    title: `${operator.name} EV Şarj Fiyatları ve Tarifeleri | ŞarjBot`,
+    description: `${operator.name} elektrikli araç şarj istasyonu güncel AC, DC ve HPC şarj fiyatları, şarj ücretleri ve uygulama bağlantıları.`,
+  };
+}
 
 function getPriceColor(price: number): string {
   if (price < 9) return "text-emerald-400";
@@ -32,6 +52,8 @@ export default async function OperatorPage({
   if (!operator) {
     notFound();
   }
+
+  const history = await getPriceHistoryBySlug(slug);
 
   const hasAnyPrice = operator.prices.AC || operator.prices.DC || operator.prices.HPC;
 
@@ -141,6 +163,11 @@ export default async function OperatorPage({
           <p className="text-xs text-muted-foreground/50 mt-1">Resmi sitesi üzerinden güncellenmeye çalışılmaktadır.</p>
         </div>
       )}
+
+      {/* History Chart */}
+      <div className="mb-8">
+        <PriceHistoryChart history={history} />
+      </div>
 
       {/* Info Table */}
       <div className="rounded-xl border border-border/60 bg-card p-5">
